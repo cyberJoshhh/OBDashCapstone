@@ -1,0 +1,791 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<!-- Add Font Awesome and Google Fonts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/pdash.css' %}">
+
+<div class="dashboard-container">
+    <div class="welcome-header">
+        <div class="welcome-text">
+            Welcome <span>{{ request.user.username }}</span>, here's your child's progress report
+        </div>
+        
+    </div>
+    
+    <!-- Add this button for mobile menu toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Add this for the sidebar overlay -->
+    <div id="sidebarOverlay"></div>
+
+    <!-- Create the sidebar structure -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>OB Pagsasarili</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="#" class="sidebar-btn">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="sidebar-btn">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="sidebar-btn">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+                <span class="notification-badge"></span>
+            </a>
+            <a href="#" class="settings-btn">
+                <i class="fas fa-chart-bar"></i>
+                <span>Evaluation</span>
+            </a>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    {% if student %}
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>{{ student.child_name }}'s Performance</h3>
+            </div>
+            <div class="card-body">
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>1st Eval</th>
+                            <th>2nd Eval</th>
+                            <th>3rd Eval</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <i class="fas fa-running" style="color: rgb(255, 99, 132);"></i> Gross Motor
+                            </td>
+                            <td>
+                                {% for eval in gross_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/13</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval1_score 13 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in gross_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/13</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval2_score 13 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in gross_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/13</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval3_score 13 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-hand-paper" style="color: rgb(54, 162, 235);"></i> Fine Motor
+                            </td>
+                            <td>
+                                {% for eval in fine_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval1_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in fine_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval2_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in fine_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval3_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-hands-helping" style="color: rgb(75, 192, 192);"></i> Self Help
+                            </td>
+                            <td>
+                                {% for eval in self_help_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval1_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in self_help_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval2_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in self_help_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval3_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-ear-listen" style="color: rgb(153, 102, 255);"></i> Receptive Language
+                            </td>
+                            <td>
+                                {% for eval in receptive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/5</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval1_score 5 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in receptive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/5</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval2_score 5 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in receptive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/5</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval3_score 5 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-comments" style="color: rgb(255, 159, 64);"></i> Expressive Language
+                            </td>
+                            <td>
+                                {% for eval in expressive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/8</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval1_score 8 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in expressive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/8</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval2_score 8 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in expressive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/8</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval3_score 8 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-brain" style="color: rgb(255, 205, 86);"></i> Cognitive
+                            </td>
+                            <td>
+                                {% for eval in cognitive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval1_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in cognitive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval2_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in cognitive_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/21</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval3_score 21 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-users" style="color: rgb(201, 203, 207);"></i> Social-Emotional
+                            </td>
+                            <td>
+                                {% for eval in social_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval1_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-social" style="width: {% widthratio eval.eval1_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in social_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval2_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-social" style="width: {% widthratio eval.eval2_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for eval in social_evaluations %}
+                                    {% if eval.student_name == student.child_name %}
+                                        <div class="score-pill">{{ eval.eval3_score }}/24</div>
+                                        <div class="progress-indicator">
+                                            <div class="progress-bar progress-social" style="width: {% widthratio eval.eval3_score 24 100 %}%"></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Progress Visualization</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 600;">Development Domains Progress</h4>
+                    <canvas id="performanceChart"></canvas>
+                    
+                    <!-- Static legend -->
+                    <div class="chart-legend" style="margin-top: 25px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(255, 99, 132);"></span>
+                            <span class="legend-text">Gross Motor</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(54, 162, 235);"></span>
+                            <span class="legend-text">Fine Motor</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(75, 192, 192);"></span>
+                            <span class="legend-text">Self Help</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(153, 102, 255);"></span>
+                            <span class="legend-text">Receptive</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(255, 159, 64);"></span>
+                            <span class="legend-text">Expressive</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(255, 205, 86);"></span>
+                            <span class="legend-text">Cognitive</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: rgb(201, 203, 207);"></span>
+                            <span class="legend-text">Social-Emotional</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>No student record found. Please contact your administrator.</div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    const labels = ['1st Evaluation', '2nd Evaluation', '3rd Evaluation'];
+    const datasets = [];
+    
+    // Define domain colors
+    const domainColors = {
+        'Gross Motor': 'rgb(255, 99, 132)',
+        'Fine Motor': 'rgb(54, 162, 235)',
+        'Self Help': 'rgb(75, 192, 192)',
+        'Receptive Language': 'rgb(153, 102, 255)',
+        'Expressive Language': 'rgb(255, 159, 64)',
+        'Cognitive': 'rgb(255, 205, 86)',
+        'Social-Emotional': 'rgb(201, 203, 207)'
+    };
+    
+    {% for eval in gross_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Gross Motor',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Gross Motor'],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Gross Motor'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in fine_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Fine Motor',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Fine Motor'],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Fine Motor'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in self_help_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Self Help',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Self Help'],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Self Help'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in receptive_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Receptive Language',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Receptive Language'],
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Receptive Language'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in expressive_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Expressive Language',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Expressive Language'],
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Expressive Language'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in cognitive_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Cognitive',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Cognitive'],
+                backgroundColor: 'rgba(255, 205, 86, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Cognitive'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+
+    {% for eval in social_evaluations %}
+        {% if eval.student_name == student.child_name %}
+            datasets.push({
+                label: 'Social-Emotional',
+                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
+                borderColor: domainColors['Social-Emotional'],
+                backgroundColor: 'rgba(201, 203, 207, 0.2)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointBackgroundColor: domainColors['Social-Emotional'],
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+        {% endif %}
+    {% endfor %}
+    
+    // Create the chart
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false  // We're using our custom legend below
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        family: "'Poppins', sans-serif",
+                        size: 14
+                    },
+                    bodyFont: {
+                        family: "'Poppins', sans-serif",
+                        size: 13
+                    },
+                    padding: 15,
+                    cornerRadius: 8,
+                    displayColors: true
+                }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeOutQuart'
+            },
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            }
+        }
+    });
+    
+    // Enhance the legend items with better visibility and interactivity
+    const legendItems = document.querySelectorAll('.legend-item');
+    
+    // First, make sure all legend items are visible with proper styling
+    legendItems.forEach(item => {
+        // Enhance visibility of legend items
+        const textElement = item.querySelector('.legend-text');
+        textElement.style.fontWeight = '600';
+        textElement.style.fontSize = '13px';
+        textElement.style.color = '#333';
+        
+        const colorElement = item.querySelector('.legend-color');
+        colorElement.style.width = '18px';
+        colorElement.style.height = '18px';
+        colorElement.style.border = '2px solid white';
+        colorElement.style.boxShadow = '0 0 2px rgba(0,0,0,0.2)';
+        
+        // Make the whole item more visible
+        item.style.padding = '8px 12px';
+        item.style.backgroundColor = 'rgba(255,255,255,0.8)';
+        item.style.borderRadius = '6px';
+        item.style.margin = '5px';
+        item.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    });
+    
+    // Then add interactivity
+    legendItems.forEach(item => {
+        const domainName = item.querySelector('.legend-text').textContent;
+        // Map shortened names back to full names for Receptive and Expressive
+        let fullDomainName = domainName;
+        if (domainName === 'Receptive') fullDomainName = 'Receptive Language';
+        if (domainName === 'Expressive') fullDomainName = 'Expressive Language';
+        
+        const datasetIndex = datasets.findIndex(d => d.label === fullDomainName);
+        
+        if (datasetIndex !== -1) {
+            // Add click event to toggle visibility
+            item.addEventListener('click', () => {
+                const isDatasetVisible = myChart.isDatasetVisible(datasetIndex);
+                
+                if (isDatasetVisible) {
+                    myChart.hide(datasetIndex);
+                    item.style.opacity = 0.5;
+                    item.style.backgroundColor = 'rgba(200,200,200,0.3)';
+                } else {
+                    myChart.show(datasetIndex);
+                    item.style.opacity = 1;
+                    item.style.backgroundColor = 'rgba(255,255,255,0.8)';
+                }
+            });
+            
+            // Add hover effect
+            item.addEventListener('mouseenter', () => {
+                item.style.backgroundColor = 'rgba(240,240,240,0.9)';
+                item.style.transform = 'translateY(-2px)';
+                item.style.boxShadow = '0 3px 5px rgba(0,0,0,0.15)';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                if (myChart.isDatasetVisible(datasetIndex)) {
+                    item.style.backgroundColor = 'rgba(255,255,255,0.8)';
+                } else {
+                    item.style.backgroundColor = 'rgba(200,200,200,0.3)';
+                }
+                item.style.transform = 'translateY(0)';
+                item.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+            });
+        }
+    });
+
+    // Mobile menu toggle functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Function to toggle sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+    }
+    
+    // Add click event to mobile menu toggle
+    mobileMenuToggle.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar when clicking on overlay
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+    
+    // Fix for sidebar links to ensure they're clickable
+    const sidebarLinks = document.querySelectorAll('.sidebar-btn, .logout-btn');
+    sidebarLinks.forEach(link => {
+        link.style.pointerEvents = 'auto';
+        link.style.cursor = 'pointer';
+        link.style.position = 'relative';
+        link.style.zIndex = '1002';
+        
+        // For debugging
+        link.addEventListener('click', function() {
+            console.log("Link clicked:", this.textContent.trim());
+        });
+    });
+});
+</script>
+
+<!-- Add this CSS to your head section -->
+<style>
+    /* Sidebar Styles */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        background-color: #2d6a4f;
+        color: white;
+        z-index: 1001;
+        transition: transform 0.3s ease;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        overflow-y: auto;
+    }
+    
+    .sidebar-header {
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .sidebar-content {
+        padding: 20px 0;
+    }
+    
+    .sidebar-btn, .logout-btn {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+        cursor: pointer;
+    }
+    
+    .sidebar-btn:hover, .logout-btn:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-btn i, .logout-btn i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .logout-btn {
+        margin-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Mobile Toggle Button */
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+        background-color: #2d6a4f;
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    /* Overlay for mobile */
+    #sidebarOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: none;
+    }
+    
+    /* Main content adjustment */
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .mobile-menu-toggle {
+            display: flex;
+        }
+        
+        #sidebarOverlay.active {
+            display: block;
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}

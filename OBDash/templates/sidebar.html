@@ -1,0 +1,31 @@
+{% load static %}
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2>OB Pagsasarili</h2>
+    </div> 
+    <div class="sidebar-menu">
+        <a href="{% url 'dashboard' %}" class="sidebar-btn {% if request.path == '/dashboard/' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{% url 'performance' %}" class="sidebar-btn {% if request.path == '/performance/' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i>
+            <span>Performance</span>
+        </a>
+        <a href="{% url 'add_student' %}" class="sidebar-btn {% if request.path == '/add_student/' %}active{% endif %}">
+            <i class="fas fa-user-plus"></i>
+            <span>Add Student</span>
+        </a>
+        <a href="{% url 'settings' %}" class="sidebar-btn {% if request.path == '/settings/' %}active{% endif %}">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div> 
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</div> 

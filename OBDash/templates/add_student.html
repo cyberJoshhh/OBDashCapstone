@@ -1,0 +1,412 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Student - OB Pagsasarili</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/add_student.css' %}">
+    
+    <!-- Add this right before the closing </head> tag -->
+    <style>
+        /* Critical mobile sidebar styles - these will override any external CSS */
+        @media (max-width: 576px) {
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: fixed !important;
+                top: 15px !important;
+                left: 15px !important;
+                z-index: 1000 !important;
+                background-color: #2d6a4f !important;
+                color: white !important;
+                border: none !important;
+                width: 50px !important;
+                height: 50px !important;
+                border-radius: 50% !important;
+                cursor: pointer !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 20px !important;
+            }
+            
+            .sidebar {
+                position: fixed !important;
+                left: -280px !important;
+                top: 0 !important;
+                height: 100% !important;
+                width: 280px !important;
+                background-color: white !important;
+                z-index: 1001 !important;
+                transition: transform 0.3s ease !important;
+                box-shadow: 0 0 20px rgba(0,0,0,0.2) !important;
+                overflow-y: auto !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            .sidebar.active {
+                transform: translateX(280px) !important;
+            }
+            
+            /* Completely reset any properties that might interfere with clicking */
+            .sidebar a, 
+            .sidebar-btn, 
+            .sidebar-item, 
+            .logout-btn,
+            .sidebar .nav-link,
+            .sidebar * {
+                pointer-events: auto !important;
+                cursor: pointer !important;
+                user-select: auto !important;
+                -webkit-user-select: auto !important;
+                -moz-user-select: auto !important;
+                -ms-user-select: auto !important;
+            }
+            
+            /* Ensure no overlays are blocking the links */
+            .sidebar::before,
+            .sidebar::after,
+            .sidebar-item::before,
+            .sidebar-item::after,
+            .sidebar-btn::before,
+            .sidebar-btn::after {
+                display: none !important;
+                content: none !important;
+            }
+            
+            .sidebar-btn, .logout-btn {
+                pointer-events: auto !important;
+                cursor: pointer !important;
+                z-index: 1002 !important;
+                position: relative !important;
+            }
+            
+            .sidebar-item {
+                pointer-events: auto !important;
+                position: relative !important;
+            }
+            
+            #sidebarOverlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background-color: rgba(0,0,0,0.5) !important;
+                z-index: 1000 !important;
+                display: none !important;
+            }
+            
+            #sidebarOverlay.active {
+                display: block !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding-top: 80px !important;
+            }
+            
+            .container {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 20px !important;
+            }
+        }
+        
+        @media (min-width: 577px) {
+            .sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100% !important;
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            
+            .container {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay"></div>
+
+    <!-- Include the sidebar -->
+    {% include 'sidebar.html' %}
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Register New Student</h1>
+            <a href="{% url 'dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <form method="POST" action="{% url 'add_student' %}">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <!-- Student Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-child"></i> Student Information</h3>
+                        <div class="form-group">
+                            <label for="child_name" class="required-field">Child's Name</label>
+                            <input type="text" id="child_name" name="child_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sex" class="required-field">Sex</label>
+                            <select id="sex" name="sex" class="form-control" required>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dob" class="required-field">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="handedness" class="required-field">Handedness</label>
+                            <select id="handedness" name="handedness" class="form-control" required>
+                                <option value="">Select Handedness</option>
+                                <option value="Right">Right-handed</option>
+                                <option value="Left">Left-handed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studying" class="required-field">Currently Studying?</label>
+                            <select id="studying" name="studying" class="form-control" required>
+                                <option value="">Select Option</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth_order" class="required-field">Birth Order</label>
+                            <input type="text" id="birth_order" name="birth_order" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="num_siblings" class="required-field">Number of Siblings</label>
+                            <input type="number" id="num_siblings" name="num_siblings" class="form-control" required min="0">
+                        </div>
+                    </div>
+
+                    <!-- Address Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+                        <div class="form-group">
+                            <label for="address" class="required-field">Street Address</label>
+                            <input type="text" id="address" name="address" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="barangay" class="required-field">Barangay</label>
+                            <input type="text" id="barangay" name="barangay" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="municipality" class="required-field">Municipality</label>
+                            <input type="text" id="municipality" name="municipality" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="province" class="required-field">Province</label>
+                            <input type="text" id="province" name="province" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="region" class="required-field">Region</label>
+                            <input type="text" id="region" name="region" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <!-- Father's Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-male"></i> Father's Information</h3>
+                        <div class="form-group">
+                            <label for="father_name" class="required-field">Name</label>
+                            <input type="text" id="father_name" name="father_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="father_age" class="required-field">Age</label>
+                            <input type="number" id="father_age" name="father_age" class="form-control" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="father_occupation" class="required-field">Occupation</label>
+                            <input type="text" id="father_occupation" name="father_occupation" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="father_education" class="required-field">Education</label>
+                            <input type="text" id="father_education" name="father_education" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="father_password" class="required-field">Password</label>
+                            <input type="password" id="father_password" name="father_password" class="form-control" required>
+                            <p class="form-note">This will be used for parent login</p>
+                        </div>
+                    </div>
+
+                    <!-- Mother's Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-female"></i> Mother's Information</h3>
+                        <div class="form-group">
+                            <label for="mother_name" class="required-field">Name</label>
+                            <input type="text" id="mother_name" name="mother_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_age" class="required-field">Age</label>
+                            <input type="number" id="mother_age" name="mother_age" class="form-control" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_occupation" class="required-field">Occupation</label>
+                            <input type="text" id="mother_occupation" name="mother_occupation" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_education" class="required-field">Education</label>
+                            <input type="text" id="mother_education" name="mother_education" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_password" class="required-field">Password</label>
+                            <input type="password" id="mother_password" name="mother_password" class="form-control" required>
+                            <p class="form-note">This will be used for parent login</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Register Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inline sidebar.js to ensure it works -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded");
+            
+            // Mobile menu toggle functionality
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            console.log("Mobile toggle:", mobileMenuToggle);
+            console.log("Sidebar:", sidebar);
+            console.log("Overlay:", sidebarOverlay);
+            
+            // Function to toggle sidebar
+            function toggleSidebar(event) {
+                console.log("Toggle sidebar called");
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                if (sidebar) {
+                    sidebar.classList.toggle('active');
+                    console.log("Sidebar active:", sidebar.classList.contains('active'));
+                }
+                
+                // Toggle overlay
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('active');
+                    console.log("Overlay active:", sidebarOverlay.classList.contains('active'));
+                }
+            }
+            
+            // Add click event to mobile menu toggle
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    console.log("Mobile menu toggle clicked");
+                    toggleSidebar(e);
+                });
+            }
+            
+            // Close sidebar when clicking on overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function(e) {
+                    console.log("Overlay clicked");
+                    toggleSidebar(e);
+                });
+            }
+            
+            // Fix for sidebar links - more aggressive approach
+            function fixSidebarLinks() {
+                // Target all possible link elements in the sidebar
+                const allSidebarElements = document.querySelectorAll('#sidebar a, #sidebar .sidebar-btn, #sidebar .logout-btn, #sidebar .nav-link');
+                
+                allSidebarElements.forEach(element => {
+                    // Remove any event listeners that might be blocking clicks
+                    const newElement = element.cloneNode(true);
+                    if (element.parentNode) {
+                        element.parentNode.replaceChild(newElement, element);
+                    }
+                    
+                    // Apply styles directly to ensure clickability
+                    newElement.style.pointerEvents = 'auto';
+                    newElement.style.cursor = 'pointer';
+                    newElement.style.position = 'relative';
+                    newElement.style.zIndex = '1010';
+                    newElement.style.display = 'block';
+                    
+                    // Add a click handler to debug and ensure navigation
+                    newElement.addEventListener('click', function(e) {
+                        console.log("Link clicked:", this.textContent.trim(), "href:", this.getAttribute('href'));
+                        
+                        // If it's an anchor with href, ensure navigation works
+                        if (this.tagName === 'A' && this.getAttribute('href')) {
+                            window.location.href = this.getAttribute('href');
+                        }
+                    });
+                    
+                    console.log("Fixed link:", newElement.textContent.trim());
+                });
+            }
+            
+            // Call the fix function
+            fixSidebarLinks();
+            
+            // Also call it after a short delay to ensure it runs after any other scripts
+            setTimeout(fixSidebarLinks, 500);
+            
+            // Form validation
+            const form = document.querySelector('form');
+            
+            form.addEventListener('submit', function(event) {
+                let isValid = true;
+                const requiredInputs = form.querySelectorAll('[required]');
+                
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.style.borderColor = 'var(--danger)';
+                    } else {
+                        input.style.borderColor = '#ddd';
+                    }
+                });
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    alert('Please fill in all required fields.');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
