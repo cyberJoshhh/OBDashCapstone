@@ -89,7 +89,6 @@
         <option value="gross_motor" {% if domain == 'gross_motor' %}selected{% endif %}>Gross Motor</option>
         <option value="fine_motor" {% if domain == 'fine_motor' %}selected{% endif %}>Fine Motor</option>
         <option value="cognitive" {% if domain == 'cognitive' %}selected{% endif %}>Cognitive</option>
-        <option value="social_emotional" {% if domain == 'social_emotional' %}selected{% endif %}>Social Emotional</option>
         <option value="self_help" {% if domain == 'self_help' %}selected{% endif %}>Self Help</option>
         <option value="receptive_language" {% if domain == 'receptive_language' %}selected{% endif %}>Receptive Language</option>
         <option value="expressive_language" {% if domain == 'expressive_language' %}selected{% endif %}>Expressive Language</option>
@@ -106,9 +105,6 @@
     </a>
     <a href="{% url 'evaluation_checklist' %}?domain=cognitive&student_name={{ request.GET.student_name }}" class="domain-link {% if domain == 'cognitive' %}active{% endif %}">
         Cognitive
-    </a>
-    <a href="{% url 'evaluation_checklist' %}?domain=social_emotional&student_name={{ request.GET.student_name }}" class="domain-link {% if domain == 'social_emotional' %}active{% endif %}">
-        Social Emotional
     </a>
     <a href="{% url 'evaluation_checklist' %}?domain=self_help&student_name={{ request.GET.student_name }}" class="domain-link {% if domain == 'self_help' %}active{% endif %}">
         Self Help

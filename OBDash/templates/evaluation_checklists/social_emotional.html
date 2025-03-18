@@ -416,6 +416,23 @@
 
     <!-- Add sidebar toggle script -->
     <script>
+        // Define calculateScores function globally
+        function calculateScores() {
+            const eval1Total = document.querySelectorAll('.eval1:checked').length;
+            const eval2Total = document.querySelectorAll('.eval2:checked').length;
+            const eval3Total = document.querySelectorAll('.eval3:checked').length;
+            
+            // Update display
+            document.getElementById('total1').textContent = eval1Total;
+            document.getElementById('total2').textContent = eval2Total;
+            document.getElementById('total3').textContent = eval3Total;
+            
+            // Update hidden form inputs
+            if (document.getElementById('eval1Score')) document.getElementById('eval1Score').value = eval1Total;
+            if (document.getElementById('eval2Score')) document.getElementById('eval2Score').value = eval2Total;
+            if (document.getElementById('eval3Score')) document.getElementById('eval3Score').value = eval3Total;
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle functionality
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
@@ -440,21 +457,6 @@
             // Close sidebar when clicking on overlay
             if (sidebarOverlay) {
                 sidebarOverlay.addEventListener('click', toggleSidebar);
-            }
-            
-            // The original script for calculating scores
-            function calculateScores() {
-                const eval1Total = document.querySelectorAll('.eval1:checked').length;
-                const eval2Total = document.querySelectorAll('.eval2:checked').length;
-                const eval3Total = document.querySelectorAll('.eval3:checked').length;
-                // Update display
-                document.getElementById('total1').textContent = eval1Total;
-                document.getElementById('total2').textContent = eval2Total;
-                document.getElementById('total3').textContent = eval3Total;
-                // Update hidden form inputs
-                if (document.getElementById('eval1Score')) document.getElementById('eval1Score').value = eval1Total;
-                if (document.getElementById('eval2Score')) document.getElementById('eval2Score').value = eval2Total;
-                if (document.getElementById('eval3Score')) document.getElementById('eval3Score').value = eval3Total;
             }
             
             // Initial calculation of scores

@@ -4,10 +4,18 @@ from .views import (
     submit_cognitive_evaluation, submit_expressive_evaluation,
     submit_fine_evaluation, submit_gross_evaluation,
     submit_receptive_evaluation,
-    submit_selfhelp_evaluation, submit_social_evaluation,
+    submit_selfhelp_evaluation,
+
+    
     performance_view,
     settings_view,
-    parent_view_social_emotional
+
+    
+    evaluation_gross,
+    evaluation_self,
+    evaluation_expressive,
+    evaluation_cognitive,
+    evaluation_social,
 )
 
 urlpatterns = [
@@ -22,8 +30,11 @@ urlpatterns = [
     path('submit-gross-evaluation/', submit_gross_evaluation, name='submit_gross_evaluation'),
     path('submit-receptive-evaluation/', submit_receptive_evaluation, name='submit_receptive_evaluation'),
     path('submit-selfhelp-evaluation/', submit_selfhelp_evaluation, name='submit_selfhelp_evaluation'),
-    path('submit-social-evaluation/', submit_social_evaluation, name='submit_social_evaluation'),
     path('performance/', performance_view, name='performance'),
     path('settings/', settings_view, name='settings'),
-    
+    path('evaluation-gross/', evaluation_gross, name='evaluation_gross'),
+    path('evaluation-self/', evaluation_self, name='evaluation_self'),
+    path('evaluation-expressive/', evaluation_expressive, name='evaluation_expressive'),
+    path('evaluation-cognitive/', evaluation_cognitive, name='evaluation_cognitive'),
+    path('evaluation-social/', evaluation_social, name='evaluation_social'),
 ]

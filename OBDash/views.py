@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Student, StudentScore, EvaluationRecord, CognitiveEvaluation, ExpressiveEvaluation, FineEvaluation, GrossEvaluation, ReceptiveEvaluation, SelfHelpEvaluation, SocialEvaluation
+from .models import Student, StudentScore, EvaluationRecord, CognitiveEvaluation, ExpressiveEvaluation, FineEvaluation, GrossEvaluation, ReceptiveEvaluation, SelfHelpEvaluation
 from .forms import StudentForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -37,7 +37,6 @@ def dashboard(request):
             'gross_evaluations': GrossEvaluation.objects.all(),
             'fine_evaluations': FineEvaluation.objects.all(),
             'self_help_evaluations': SelfHelpEvaluation.objects.all(),
-            'social_evaluations': SocialEvaluation.objects.all(),
             'expressive_evaluations': ExpressiveEvaluation.objects.all(),
             'receptive_evaluations': ReceptiveEvaluation.objects.all(),
             'cognitive_evaluations': CognitiveEvaluation.objects.all()
@@ -52,7 +51,6 @@ def dashboard(request):
         evaluations_count = (GrossEvaluation.objects.count() + 
                             FineEvaluation.objects.count() + 
                             SelfHelpEvaluation.objects.count() + 
-                            SocialEvaluation.objects.count() + 
                             ExpressiveEvaluation.objects.count() + 
                             ReceptiveEvaluation.objects.count() + 
                             CognitiveEvaluation.objects.count())
@@ -163,13 +161,6 @@ def evaluation_checklist(request):
     return render(request, template_name)
 
 @csrf_protect
-def social_emotional_checklist(request, student_id):
-    student = Student.objects.get(id=student_id)
-    context = {
-        'student': student
-    }
-    return render(request, 'evaluation_checklists/social_emotional.html', context)
-
 def cognitive_checklist(request, student_id):
     student = Student.objects.get(id=student_id)
     context = {
@@ -198,7 +189,6 @@ def checklist_view(request, student_id, domain):
     # Add domain-specific context
     domain_titles = {
         'cognitive': 'Cognitive Domain',
-        'social_emotional': 'Social-Emotional Domain',
         'fine_motor': 'Fine Motor Domain',
         'gross_motor': 'Gross Motor Domain',
         'self_help': 'Self-Help Domain',
@@ -323,29 +313,8 @@ def submit_selfhelp_evaluation(request):
             eval2_score=eval2_score,
             eval3_score=eval3_score
         )
-
         messages.success(request, 'Evaluation submitted successfully!')
         return redirect('dashboard')  # or wherever you want to redirect after submission
-
-    return redirect('dashboard')
-
-def submit_social_evaluation(request):
-    if request.method == 'POST':
-        student_name = request.POST.get('student_name')
-        eval1_score = int(request.POST.get('eval1_score', 0) or 0)
-        eval2_score = int(request.POST.get('eval2_score', 0) or 0)
-        eval3_score = int(request.POST.get('eval3_score', 0) or 0)
-
-        SocialEvaluation.objects.create(
-            student_name=student_name,
-            eval1_score=eval1_score,
-            eval2_score=eval2_score,
-            eval3_score=eval3_score
-        )
-
-        messages.success(request, 'Evaluation submitted successfully!')
-        return redirect('dashboard')  # or wherever you want to redirect after submission
-
     return redirect('dashboard')
 
 @login_required
@@ -360,14 +329,12 @@ def performance_view(request):
     receptive_evaluations = ReceptiveEvaluation.objects.all()
     expressive_evaluations = ExpressiveEvaluation.objects.all()
     cognitive_evaluations = CognitiveEvaluation.objects.all()
-    social_evaluations = SocialEvaluation.objects.all()
     
     # Add users_count for consistency with other views
     users_count = User.objects.count()
     evaluations_count = (GrossEvaluation.objects.count() + 
                         FineEvaluation.objects.count() + 
                         SelfHelpEvaluation.objects.count() + 
-                        SocialEvaluation.objects.count() + 
                         ExpressiveEvaluation.objects.count() + 
                         ReceptiveEvaluation.objects.count() + 
                         CognitiveEvaluation.objects.count())
@@ -380,7 +347,6 @@ def performance_view(request):
         'receptive_evaluations': receptive_evaluations,
         'expressive_evaluations': expressive_evaluations,
         'cognitive_evaluations': cognitive_evaluations,
-        'social_evaluations': social_evaluations,
         'users_count': users_count,
         'evaluations_count': evaluations_count,
         'messages_count': 0
@@ -394,23 +360,90 @@ def settings_view(request):
     """
     return render(request, 'settings.html')
 
-def parent_view_social_emotional(request):
-    # Get student name associated with parent (adjust based on your models)
-    student_name = "Your Child"  # Default fallback
+def evaluation_gross(request):
+    # Get username and convert to proper format for comparison
+    username = request.user.username.replace('_', ' ')
     
-    try:
-        # Adjust this query based on your model relationships
-        parent = request.user
-        student = Student.objects.filter(parent=parent).first()
-        if student:
-            student_name = student.child_name
-    except:
-        pass
+    # Find student by parent's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
     
-    # Pass the student name to the template
     context = {
-        'student_name': student_name
+        'student': student,
+        'active_domain': 'gross'
     }
     
-    return render(request, 'evaluation_checklists/social_emotional.html', context)
+    return render(request, 'pevalgross.html', context)
+
+
+def evaluation_self(request):
+    # Get username and convert to proper format for comparison
+    username = request.user.username.replace('_', ' ')
+    
+    # Find student by parent's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
+    
+    context = {
+        'student': student,
+        'active_domain': 'self'
+    }
+    
+    return render(request, 'pevalself.html', context)
+
+def evaluation_expressive(request):
+    # Get username and convert to proper format for comparison
+    username = request.user.username.replace('_', ' ')
+    
+    # Find student by parent's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
+    
+    context = {
+        'student': student,
+        'active_domain': 'expressive'
+    }
+    
+    return render(request, 'pevalexpressive.html', context)
+
+def evaluation_cognitive(request):
+    # Get username and convert to proper format for comparison
+    username = request.user.username.replace('_', ' ')
+    
+    # Find student by parent's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
+    
+    context = {
+        'student': student,
+        'active_domain': 'cognitive'
+    }
+    
+    return render(request, 'pevalcognitive.html', context)
+
+def evaluation_social(request):
+    # Get username and convert to proper format for comparison
+    username = request.user.username.replace('_', ' ')
+    
+    # Find student by parent's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
+    
+    context = {
+        'student': student,
+        'active_domain': 'social'
+    }
+    
+    return render(request, 'pevalsocial.html', context)
+
 
