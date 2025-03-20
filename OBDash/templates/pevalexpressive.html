@@ -81,6 +81,12 @@
             </tbody>
         </table>
     </div>
+    
+    <div class="submit-button-container">
+        <button type="button" class="submit-button">
+            <i class="fas fa-save"></i> Save Evaluation
+        </button>
+    </div>
 </div>
 
 <style>
@@ -208,6 +214,33 @@ td {
 
 tr:last-child td {
     transition: background-color 0.3s ease;
+}
+
+.submit-button-container {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.submit-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    background-color: #2d6a4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #1b4332;
+}
+
+.submit-button i {
+    margin-right: 0.5rem;
 }
 </style>
 

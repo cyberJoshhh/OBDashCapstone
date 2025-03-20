@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 import json
 from django.db.models import Q
+from django.utils import timezone
 
 @login_required
 def dashboard(request):
@@ -302,19 +303,61 @@ def submit_receptive_evaluation(request):
 
 def submit_selfhelp_evaluation(request):
     if request.method == 'POST':
+        student_id = request.POST.get('student_id')
         student_name = request.POST.get('student_name')
         eval1_score = int(request.POST.get('eval1_score', 0) or 0)
         eval2_score = int(request.POST.get('eval2_score', 0) or 0)
         eval3_score = int(request.POST.get('eval3_score', 0) or 0)
+        
+        try:
+            # Find the student - either by ID or by name
+            student = None
+            if student_id and student_id.isdigit():
+                try:
+                    student = Student.objects.get(id=int(student_id))
+                except Student.DoesNotExist:
+                    pass
+            
+            if not student and student_name:
+                # Try to find by name if ID didn't work
+                student = Student.objects.filter(child_name__iexact=student_name).first()
+            
+            # If we found a student, update their StudentScore record
+            if student:
+                # Calculate highest score or the most recent evaluation
+                # You can adjust this logic as needed
+                highest_score = max(eval1_score, eval2_score, eval3_score)
+                
+                # Get or create StudentScore
+                student_score, created = StudentScore.objects.get_or_create(
+                    student=student,
+                    defaults={
+                        'self_help': highest_score,
+                        'date_assessed': timezone.now().date()
+                    }
+                )
+                
+                if not created:
+                    # Update existing score
+                    student_score.self_help = highest_score
+                    student_score.date_assessed = timezone.now().date()
+                    student_score.save()
+            
+            # Save in domain-specific evaluation model
+            SelfHelpEvaluation.objects.create(
+                student_name=student_name if student_name else (student.child_name if student else "Unknown"),
+                eval1_score=eval1_score,
+                eval2_score=eval2_score,
+                eval3_score=eval3_score
+            )
+            
+            messages.success(request, 'Evaluation submitted successfully!')
+            return JsonResponse({'status': 'success'})
+            
+        except Exception as e:
+            messages.error(request, f'Error saving evaluation: {str(e)}')
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
-        SelfHelpEvaluation.objects.create(
-            student_name=student_name,
-            eval1_score=eval1_score,
-            eval2_score=eval2_score,
-            eval3_score=eval3_score
-        )
-        messages.success(request, 'Evaluation submitted successfully!')
-        return redirect('dashboard')  # or wherever you want to redirect after submission
     return redirect('dashboard')
 
 @login_required

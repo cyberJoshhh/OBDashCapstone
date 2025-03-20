@@ -201,6 +201,12 @@
             </tbody>
         </table>
     </div>
+    
+    <div class="submit-button-container">
+        <button type="button" class="submit-button">
+            <i class="fas fa-save"></i> Save Evaluation
+        </button>
+    </div>
 </div>
 
 <style>
@@ -329,6 +335,33 @@ td {
 tr:last-child td {
     transition: background-color 0.3s ease;
 }
+
+.submit-button-container {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.submit-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    background-color: #2d6a4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #1b4332;
+}
+
+.submit-button i {
+    margin-right: 0.5rem;
+}
 </style>
 
 <script>
@@ -383,6 +416,83 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize totals on page load
     updateTotalScore();
+    
+    // Updated submission function
+    document.querySelector('.submit-button').addEventListener('click', function() {
+        // Get the total scores
+        const totalRow = document.querySelector('tbody tr:last-child');
+        const eval1Score = totalRow.cells[2].textContent;
+        const eval2Score = totalRow.cells[3].textContent;
+        const eval3Score = totalRow.cells[4].textContent;
+        
+        // Get student ID from a hidden input field we'll add
+        const studentId = document.getElementById('student-id') ? document.getElementById('student-id').value : '';
+        const studentName = document.getElementById('student-name') ? document.getElementById('student-name').value : '';
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('student_id', studentId);
+        formData.append('student_name', studentName);
+        formData.append('eval1_score', eval1Score);
+        formData.append('eval2_score', eval2Score);
+        formData.append('eval3_score', eval3Score);
+        
+        // Collect comments
+        const comments = [];
+        document.querySelectorAll('.comment-input').forEach(function(input, index) {
+            if (input.value.trim() !== '') {
+                comments.push({
+                    item: index + 1,
+                    comment: input.value.trim()
+                });
+            }
+        });
+        
+        if (comments.length > 0) {
+            formData.append('comments', JSON.stringify(comments));
+        }
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Submit the data
+        fetch('{% url "submit_selfhelp_evaluation" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().then(data => {
+                    alert('Evaluation saved successfully!');
+                    window.location.href = '{% url "dashboard" %}';
+                });
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Error saving evaluation');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'Error saving evaluation. Please try again.');
+        });
+    });
 });
 </script>
+
+<!-- Add CSRF Token -->
+{% csrf_token %}
+
+<!-- Add hidden fields for student information -->
+{% if student %}
+<input type="hidden" id="student-id" value="{{ student.id }}">
+<input type="hidden" id="student-name" value="{{ student.child_name }}">
+{% else %}
+<input type="hidden" id="student-id" value="">
+<input type="hidden" id="student-name" value="Unknown Student">
+{% endif %}
+
 {% endblock %} 
