@@ -308,6 +308,7 @@ def submit_selfhelp_evaluation(request):
         eval1_score = int(request.POST.get('eval1_score', 0) or 0)
         eval2_score = int(request.POST.get('eval2_score', 0) or 0)
         eval3_score = int(request.POST.get('eval3_score', 0) or 0)
+        evaluator_type = request.POST.get('evaluator_type', 'teacher')  # Default to teacher if not specified
         
         try:
             # Find the student - either by ID or by name
@@ -324,32 +325,72 @@ def submit_selfhelp_evaluation(request):
             
             # If we found a student, update their StudentScore record
             if student:
-                # Calculate highest score or the most recent evaluation
-                # You can adjust this logic as needed
-                highest_score = max(eval1_score, eval2_score, eval3_score)
-                
-                # Get or create StudentScore
+                # Get existing score for this student
                 student_score, created = StudentScore.objects.get_or_create(
                     student=student,
                     defaults={
-                        'self_help': highest_score,
+                        'self_help': 0,
                         'date_assessed': timezone.now().date()
                     }
                 )
                 
-                if not created:
-                    # Update existing score
-                    student_score.self_help = highest_score
-                    student_score.date_assessed = timezone.now().date()
-                    student_score.save()
+                # Get existing evaluations for this student
+                teacher_eval = SelfHelpEvaluation.objects.filter(
+                    student_name=student.child_name,
+                    evaluator_type='teacher'
+                ).order_by('-created_at').first()
+                
+                parent_eval = SelfHelpEvaluation.objects.filter(
+                    student_name=student.child_name,
+                    evaluator_type='parent'
+                ).order_by('-created_at').first()
+                
+                # Save new evaluation
+                SelfHelpEvaluation.objects.create(
+                    student_name=student.child_name,
+                    eval1_score=eval1_score,
+                    eval2_score=eval2_score,
+                    eval3_score=eval3_score,
+                    evaluator_type=evaluator_type
+                )
+                
+                # Calculate combined score based on both teacher and parent evaluations
+                teacher_score = max(
+                    teacher_eval.eval1_score, 
+                    teacher_eval.eval2_score, 
+                    teacher_eval.eval3_score
+                ) if teacher_eval else 0
+                
+                parent_score = max(
+                    parent_eval.eval1_score, 
+                    parent_eval.eval2_score, 
+                    parent_eval.eval3_score
+                ) if parent_eval else 0
+                
+                # If this is a new evaluation, use its scores
+                if evaluator_type == 'teacher':
+                    teacher_score = max(eval1_score, eval2_score, eval3_score)
+                else:
+                    parent_score = max(eval1_score, eval2_score, eval3_score)
+                
+                # Calculate combined score (average of teacher and parent scores)
+                # You can adjust this formula according to your requirements
+                combined_score = (teacher_score + parent_score) / 2 if teacher_score and parent_score else (teacher_score or parent_score)
+                
+                # Update the StudentScore
+                student_score.self_help = combined_score
+                student_score.date_assessed = timezone.now().date()
+                student_score.save()
             
-            # Save in domain-specific evaluation model
-            SelfHelpEvaluation.objects.create(
-                student_name=student_name if student_name else (student.child_name if student else "Unknown"),
-                eval1_score=eval1_score,
-                eval2_score=eval2_score,
-                eval3_score=eval3_score
-            )
+            else:
+                # If student not found, just save the evaluation
+                SelfHelpEvaluation.objects.create(
+                    student_name=student_name if student_name else "Unknown",
+                    eval1_score=eval1_score,
+                    eval2_score=eval2_score,
+                    eval3_score=eval3_score,
+                    evaluator_type=evaluator_type
+                )
             
             messages.success(request, 'Evaluation submitted successfully!')
             return JsonResponse({'status': 'success'})
