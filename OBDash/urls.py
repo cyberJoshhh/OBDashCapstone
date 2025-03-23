@@ -16,6 +16,13 @@ from .views import (
     evaluation_expressive,
     evaluation_cognitive,
     evaluation_social,
+
+    
+    ParentEvaluationSelf,
+    ParentEvaluationGross,
+    ParentEvaluationSocial,
+    ParentEvaluationExpressive,
+    ParentEvaluationCognitive,
 )
 
 urlpatterns = [
@@ -37,4 +44,14 @@ urlpatterns = [
     path('evaluation-expressive/', evaluation_expressive, name='evaluation_expressive'),
     path('evaluation-cognitive/', evaluation_cognitive, name='evaluation_cognitive'),
     path('evaluation-social/', evaluation_social, name='evaluation_social'),
+    path('parent-evaluation-self/', ParentEvaluationSelf, name='parent_evaluation_self'),
+    path('parent-evaluation-self/<int:student_id>/', ParentEvaluationSelf, name='parent_evaluation_self_with_id'),
+    path('parent-evaluation-gross/', ParentEvaluationGross, name='parent_evaluation_gross'),
+    path('parent-evaluation-gross/<int:student_id>/', ParentEvaluationGross, name='parent_evaluation_gross_with_id'),
+    path('parent-evaluation-social/', ParentEvaluationSocial, name='parent_evaluation_social'),
+    path('parent-evaluation-social/<int:student_id>/', ParentEvaluationSocial, name='parent_evaluation_social_with_id'),
+    path('parent-evaluation-expressive/', ParentEvaluationExpressive, name='parent_evaluation_expressive'),
+    path('parent-evaluation-expressive/<int:student_id>/', ParentEvaluationExpressive, name='parent_evaluation_expressive_with_id'),
+    path('parent-evaluation-cognitive/', ParentEvaluationCognitive, name='parent_evaluation_cognitive'),
+    path('parent-evaluation-cognitive/<int:student_id>/', ParentEvaluationCognitive, name='parent_evaluation_cognitive_with_id'),
 ]

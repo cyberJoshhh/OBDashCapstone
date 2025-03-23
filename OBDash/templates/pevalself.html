@@ -421,11 +421,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.submit-button').addEventListener('click', function() {
         // Get the total scores
         const totalRow = document.querySelector('tbody tr:last-child');
-        const eval1Score = totalRow.cells[2].textContent;
-        const eval2Score = totalRow.cells[3].textContent;
-        const eval3Score = totalRow.cells[4].textContent;
+        const eval1Score = parseInt(totalRow.cells[2].textContent) || 0;
+        const eval2Score = parseInt(totalRow.cells[3].textContent) || 0;
+        const eval3Score = parseInt(totalRow.cells[4].textContent) || 0;
         
-        // Get student ID from a hidden input field we'll add
+        // Get student ID and name from hidden input fields
         const studentId = document.getElementById('student-id') ? document.getElementById('student-id').value : '';
         const studentName = document.getElementById('student-name') ? document.getElementById('student-name').value : '';
         
@@ -436,7 +436,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('eval1_score', eval1Score);
         formData.append('eval2_score', eval2Score);
         formData.append('eval3_score', eval3Score);
-        formData.append('evaluator_type', 'parent');
         
         // Collect comments
         const comments = [];
@@ -456,8 +455,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get CSRF token
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
+        // Add visual feedback
+        const submitButton = document.querySelector('.submit-button');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitButton.disabled = true;
+        
         // Submit the data
-        fetch('{% url "submit_selfhelp_evaluation" %}', {
+        fetch('{% url "parent_evaluation_self" %}', {
             method: 'POST',
             body: formData,
             headers: {
@@ -465,12 +470,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(response => {
+            submitButton.disabled = false;
             if (response.ok) {
                 return response.json().then(data => {
-                    alert('Evaluation saved successfully!');
-                    window.location.href = '{% url "dashboard" %}';
+                    submitButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    setTimeout(() => {
+                        alert('Self-Help evaluation saved successfully!');
+                        window.location.href = '{% url "dashboard" %}';
+                    }, 500);
                 });
             } else {
+                submitButton.innerHTML = originalText;
                 return response.json().then(data => {
                     throw new Error(data.message || 'Error saving evaluation');
                 });
@@ -478,6 +488,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
             alert(error.message || 'Error saving evaluation. Please try again.');
         });
     });

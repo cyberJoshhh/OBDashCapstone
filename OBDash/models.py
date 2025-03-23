@@ -155,4 +155,53 @@ class SocialEvaluation(models.Model):
         return f"{self.student_name} - {self.created_at}"
 
 
+#parent's evaluation
+class ParentSocialEvaluation(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_score = models.IntegerField()
+    eval2_score = models.IntegerField()
+    eval3_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"
+
+class ParentSelfHelpEvaluation(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_score = models.IntegerField()
+    eval2_score = models.IntegerField()
+    eval3_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"
+
+class ParentGrossEvaluation(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_score = models.IntegerField()
+    eval2_score = models.IntegerField()
+    eval3_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"
+
+class ParentCognitiveEvaluation(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_score = models.IntegerField()
+    eval2_score = models.IntegerField()
+    eval3_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"
+
+class ParentExpressiveEvaluation(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_score = models.IntegerField()
+    eval2_score = models.IntegerField()
+    eval3_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"

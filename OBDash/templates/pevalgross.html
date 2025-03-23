@@ -292,6 +292,95 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize totals on page load
     updateTotalScore();
+    
+    // Updated submission function
+    document.querySelector('.submit-button').addEventListener('click', function() {
+        // Get the total scores
+        const totalRow = document.querySelector('tbody tr:last-child');
+        const eval1Score = parseInt(totalRow.cells[2].textContent) || 0;
+        const eval2Score = parseInt(totalRow.cells[3].textContent) || 0;
+        const eval3Score = parseInt(totalRow.cells[4].textContent) || 0;
+        
+        // Get student ID and name from hidden input fields
+        const studentId = document.getElementById('student-id') ? document.getElementById('student-id').value : '';
+        const studentName = document.getElementById('student-name') ? document.getElementById('student-name').value : '';
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('student_id', studentId);
+        formData.append('student_name', studentName);
+        formData.append('eval1_score', eval1Score);
+        formData.append('eval2_score', eval2Score);
+        formData.append('eval3_score', eval3Score);
+        
+        // Collect comments
+        const comments = [];
+        document.querySelectorAll('.comment-input').forEach(function(input, index) {
+            if (input.value.trim() !== '') {
+                comments.push({
+                    item: index + 1,
+                    comment: input.value.trim()
+                });
+            }
+        });
+        
+        if (comments.length > 0) {
+            formData.append('comments', JSON.stringify(comments));
+        }
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Add visual feedback
+        const submitButton = document.querySelector('.submit-button');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitButton.disabled = true;
+        
+        // Submit the data to the new endpoint
+        fetch('{% url "parent_evaluation_gross" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            submitButton.disabled = false;
+            if (response.ok) {
+                return response.json().then(data => {
+                    submitButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    setTimeout(() => {
+                        alert('Gross Motor evaluation saved successfully!');
+                        window.location.href = '{% url "dashboard" %}';
+                    }, 500);
+                });
+            } else {
+                submitButton.innerHTML = originalText;
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Error saving evaluation');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            alert(error.message || 'Error saving evaluation. Please try again.');
+        });
+    });
 });
 </script>
+
+<!-- Add CSRF Token -->
+{% csrf_token %}
+
+<!-- Add hidden fields for student information -->
+{% if student %}
+<input type="hidden" id="student-id" value="{{ student.id }}">
+<input type="hidden" id="student-name" value="{{ student.child_name }}">
+{% else %}
+<input type="hidden" id="student-id" value="">
+<input type="hidden" id="student-name" value="Unknown Student">
+{% endif %}
 {% endblock %}
