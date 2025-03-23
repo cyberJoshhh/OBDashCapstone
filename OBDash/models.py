@@ -83,7 +83,8 @@ class EvaluationRecord(models.Model):
 
     class Meta:
         unique_together = ['student', 'evaluation_number']
-
+        
+ #teacher's evaluation
 class CognitiveEvaluation(models.Model):
     student_name = models.CharField(max_length=255)
     eval1_score = models.IntegerField()
@@ -205,3 +206,15 @@ class ParentExpressiveEvaluation(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.created_at}"
+
+class TotalScores(models.Model):
+    student_name = models.CharField(max_length=255)
+    eval1_total = models.IntegerField()
+    eval2_total = models.IntegerField()
+    eval3_total = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student_name} - {self.created_at}"
+
+

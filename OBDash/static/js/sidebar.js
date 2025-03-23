@@ -65,6 +65,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         document.body.appendChild(overlay);
+        
+        // Ensure sidebar is above the overlay
+        if (sidebar) {
+            sidebar.style.zIndex = '100';
+            sidebar.style.position = 'relative';
+        }
     }
     
     // Function to remove sidebar overlay
