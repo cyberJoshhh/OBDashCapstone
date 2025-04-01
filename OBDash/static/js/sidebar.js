@@ -81,42 +81,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Filter students functionality
-    window.filterStudents = function() {
-        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    // Fix sidebar links to ensure they're clickable
+    function fixSidebarLinks() {
+        // Target all possible link elements in the sidebar
+        const allSidebarElements = document.querySelectorAll('#sidebar a, #sidebar .sidebar-btn, #sidebar .logout-btn');
         
-        // Check if we're on the performance page
-        const performanceCards = document.querySelectorAll('.performance-card');
-        if (performanceCards.length > 0) {
-            performanceCards.forEach(card => {
-                const studentName = card.querySelector('.card-header h3').textContent.toLowerCase();
-                
-                if (studentName.includes(searchValue)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-        
-        // Check if we're on the dashboard page
-        const studentCards = document.querySelectorAll('.student-card');
-        if (studentCards.length > 0) {
-            studentCards.forEach(card => {
-                const studentName = card.querySelector('.student-name').textContent.toLowerCase();
-                const fatherName = card.querySelector('[data-parent="father"]')?.textContent.toLowerCase() || '';
-                const motherName = card.querySelector('[data-parent="mother"]')?.textContent.toLowerCase() || '';
-                
-                if (studentName.includes(searchValue) || 
-                    fatherName.includes(searchValue) || 
-                    motherName.includes(searchValue)) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-    };
+        allSidebarElements.forEach(element => {
+            // Apply styles directly to ensure clickability
+            element.style.pointerEvents = 'auto';
+            element.style.cursor = 'pointer';
+            element.style.position = 'relative';
+            element.style.zIndex = '1010';
+        });
+    }
+    
+    // Call the fix function
+    fixSidebarLinks();
+    
+    // Filter students functionality (if search input exists)
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            window.filterStudents();
+        });
+    }
 });
 
 // Add Student Modal functionality

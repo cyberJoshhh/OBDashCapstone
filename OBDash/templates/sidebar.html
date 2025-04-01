@@ -9,7 +9,7 @@
             <i class="fas fa-home"></i>
             <span>Dashboard</span>
         </a>
-        <a href="{% url 'performance' %}" class="sidebar-btn {% if request.path == '/performance/' %}active{% endif %}">
+        <a href="{% url 'comparison_view' %}" class="sidebar-btn {% if request.path == '/comparison/' %}active{% endif %}">
             <i class="fas fa-chart-line"></i>
             <span>Performance</span>
         </a>
@@ -21,9 +21,11 @@
             <i class="fas fa-cog"></i>
             <span>Settings</span>
         </a>
+    </div>
+    <div class="sidebar-footer">
         <a href="{% url 'logout' %}" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
         </a>
-    </div> 
+    </div>
 </div> 

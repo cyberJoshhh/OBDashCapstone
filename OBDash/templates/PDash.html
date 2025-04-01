@@ -12,9 +12,7 @@
         <div class="welcome-text">
             Welcome <span>{{ request.user.username }}</span>, here's your child's progress report
         </div>
-        
     </div>
-    
     <!-- Add this button for mobile menu toggle -->
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
@@ -628,6 +626,89 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Link clicked:", this.textContent.trim());
         });
     });
+
+    // Function to log all evaluation scores
+    function logAllScores() {
+        // Teacher evaluations
+        console.log('Teacher Evaluations:');
+        console.log('Gross Motor:', document.getElementById('teacher_gross_scores').value);
+        console.log('Fine Motor:', document.getElementById('teacher_fine_scores').value);
+        console.log('Self Help:', document.getElementById('teacher_self_help_scores').value);
+        console.log('Receptive:', document.getElementById('teacher_receptive_scores').value);
+        console.log('Expressive:', document.getElementById('teacher_expressive_scores').value);
+        console.log('Cognitive:', document.getElementById('teacher_cognitive_scores').value);
+
+        // Parent evaluations
+        console.log('Parent Evaluations:');
+        console.log('Gross Motor:', document.getElementById('parent_gross_scores').value);
+        console.log('Self Help:', document.getElementById('parent_self_help_scores').value);
+        console.log('Social:', document.getElementById('parent_social_scores').value);
+        console.log('Expressive:', document.getElementById('parent_expressive_scores').value);
+        console.log('Cognitive:', document.getElementById('parent_cognitive_scores').value);
+    }
+
+    // Call the function when page loads
+    logAllScores();
+
+    // Add debug button functionality
+    const checkDataBtn = document.getElementById('checkDataBtn');
+    const dataDisplay = document.getElementById('dataDisplay');
+
+    checkDataBtn.addEventListener('click', function() {
+        const parentData = {
+            'Gross Motor': document.getElementById('parent_gross_scores').value,
+            'Self Help': document.getElementById('parent_self_help_scores').value,
+            'Social': document.getElementById('parent_social_scores').value,
+            'Expressive': document.getElementById('parent_expressive_scores').value,
+            'Cognitive': document.getElementById('parent_cognitive_scores').value
+        };
+
+        dataDisplay.style.display = 'block';
+        dataDisplay.innerHTML = '<h4>Parent Evaluation Data:</h4>' + 
+            '<pre>' + JSON.stringify(parentData, null, 2) + '</pre>';
+    });
+
+    // Toggle debug section
+    const toggleDebugBtn = document.getElementById('toggleDebug');
+    const debugSection = document.querySelector('.debug-section');
+    
+    toggleDebugBtn.addEventListener('click', function() {
+        if (debugSection.style.display === 'none') {
+            debugSection.style.display = 'block';
+            toggleDebugBtn.textContent = 'Hide Debug Info';
+        } else {
+            debugSection.style.display = 'none';
+            toggleDebugBtn.textContent = 'Show Debug Info';
+        }
+    });
+    
+    // Check hidden fields
+    const checkHiddenFieldsBtn = document.getElementById('checkHiddenFields');
+    const hiddenFieldsOutput = document.getElementById('hiddenFieldsOutput');
+    
+    checkHiddenFieldsBtn.addEventListener('click', function() {
+        const hiddenFields = {
+            'Gross Motor': document.getElementById('parent_gross_scores').value,
+            'Self Help': document.getElementById('parent_self_help_scores').value,
+            'Social': document.getElementById('parent_social_scores').value,
+            'Expressive': document.getElementById('parent_expressive_scores').value,
+            'Cognitive': document.getElementById('parent_cognitive_scores').value
+        };
+        
+        // Display the data
+        hiddenFieldsOutput.style.display = 'block';
+        hiddenFieldsOutput.innerHTML = '';
+        
+        for (const [key, value] of Object.entries(hiddenFields)) {
+            const row = document.createElement('div');
+            row.style.margin = '5px 0';
+            row.innerHTML = `<strong>${key}:</strong> ${value || 'No data'}`;
+            hiddenFieldsOutput.appendChild(row);
+        }
+    });
+    
+    // Initially hide the debug section
+    debugSection.style.display = 'none';
 });
 </script>
 

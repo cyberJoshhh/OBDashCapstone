@@ -39,7 +39,7 @@ body {
     box-shadow: var(--shadow);
     padding: 30px;
     margin-bottom: 30px;
-    width: 1500px;
+    width: 1400px!important;
 }
 
 .page-header {

@@ -206,7 +206,7 @@ class ParentExpressiveEvaluation(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.created_at}"
-
+        
 class TotalScores(models.Model):
     student_name = models.CharField(max_length=255)
     eval1_total = models.IntegerField()
@@ -216,5 +216,3 @@ class TotalScores(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.created_at}"
-
-

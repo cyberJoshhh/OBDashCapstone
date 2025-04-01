@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import (
     add_student, dashboard, login_view, logout_view, evaluation_checklist,
     submit_cognitive_evaluation, submit_expressive_evaluation,
@@ -54,4 +55,5 @@ urlpatterns = [
     path('parent-evaluation-expressive/<int:student_id>/', ParentEvaluationExpressive, name='parent_evaluation_expressive_with_id'),
     path('parent-evaluation-cognitive/', ParentEvaluationCognitive, name='parent_evaluation_cognitive'),
     path('parent-evaluation-cognitive/<int:student_id>/', ParentEvaluationCognitive, name='parent_evaluation_cognitive_with_id'),
+    path('comparison/', views.comparison_view, name='comparison_view'),
 ]

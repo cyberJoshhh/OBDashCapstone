@@ -7,132 +7,31 @@
     <title>Add New Student - OB Pagsasarili</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Include CSS files - sidebar.css must come first for proper overrides -->
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
     <link rel="stylesheet" href="{% static 'css/add_student.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tdash.css' %}">
     
-    <!-- Add this right before the closing </head> tag -->
     <style>
-        /* Critical mobile sidebar styles - these will override any external CSS */
-        @media (max-width: 576px) {
-            .mobile-menu-toggle {
-                display: flex !important;
-                position: fixed !important;
-                top: 15px !important;
-                left: 15px !important;
-                z-index: 1000 !important;
-                background-color: #2d6a4f !important;
-                color: white !important;
-                border: none !important;
-                width: 50px !important;
-                height: 50px !important;
-                border-radius: 50% !important;
-                cursor: pointer !important;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 20px !important;
-            }
-            
-            .sidebar {
-                position: fixed !important;
-                left: -280px !important;
-                top: 0 !important;
-                height: 100% !important;
-                width: 280px !important;
-                background-color: white !important;
-                z-index: 1001 !important;
-                transition: transform 0.3s ease !important;
-                box-shadow: 0 0 20px rgba(0,0,0,0.2) !important;
-                overflow-y: auto !important;
-                margin-top: 0 !important;
-                padding-top: 0 !important;
-            }
-            
-            .sidebar.active {
-                transform: translateX(280px) !important;
-            }
-            
-            /* Completely reset any properties that might interfere with clicking */
-            .sidebar a, 
-            .sidebar-btn, 
-            .sidebar-item, 
-            .logout-btn,
-            .sidebar .nav-link,
-            .sidebar * {
-                pointer-events: auto !important;
-                cursor: pointer !important;
-                user-select: auto !important;
-                -webkit-user-select: auto !important;
-                -moz-user-select: auto !important;
-                -ms-user-select: auto !important;
-            }
-            
-            /* Ensure no overlays are blocking the links */
-            .sidebar::before,
-            .sidebar::after,
-            .sidebar-item::before,
-            .sidebar-item::after,
-            .sidebar-btn::before,
-            .sidebar-btn::after {
-                display: none !important;
-                content: none !important;
-            }
-            
-            .sidebar-btn, .logout-btn {
-                pointer-events: auto !important;
-                cursor: pointer !important;
-                z-index: 1002 !important;
-                position: relative !important;
-            }
-            
-            .sidebar-item {
-                pointer-events: auto !important;
-                position: relative !important;
-            }
-            
-            #sidebarOverlay {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background-color: rgba(0,0,0,0.5) !important;
-                z-index: 1000 !important;
-                display: none !important;
-            }
-            
-            #sidebarOverlay.active {
-                display: block !important;
-            }
-            
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-                padding-top: 80px !important;
-            }
-            
-            .container {
-                margin-left: 0 !important;
-                width: 100% !important;
-                padding: 20px !important;
-            }
+        /* Add any add_student specific styles that don't affect the sidebar */
+        .required-field:after {
+            content: " *";
+            color: #dc3545;
         }
         
-        @media (min-width: 577px) {
-            .sidebar {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                height: 100% !important;
-                margin-top: 0 !important;
-                padding-top: 0 !important;
-            }
-            
-            .container {
-                margin-left: 250px;
-                width: calc(100% - 250px);
-                padding: 20px;
-            }
+        .form-note {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 30px;
         }
     </style>
 </head>
@@ -148,12 +47,9 @@
     <!-- Include the sidebar -->
     {% include 'sidebar.html' %}
 
-    <div class="container">
+    <div class="main-content">
         <div class="page-header">
             <h1 class="page-title">Register New Student</h1>
-            <a href="{% url 'dashboard' %}" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
         </div>
 
         {% if messages %}
@@ -296,117 +192,7 @@
         </div>
     </div>
 
-    <!-- Inline sidebar.js to ensure it works -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM fully loaded");
-            
-            // Mobile menu toggle functionality
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
-            console.log("Mobile toggle:", mobileMenuToggle);
-            console.log("Sidebar:", sidebar);
-            console.log("Overlay:", sidebarOverlay);
-            
-            // Function to toggle sidebar
-            function toggleSidebar(event) {
-                console.log("Toggle sidebar called");
-                if (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                
-                if (sidebar) {
-                    sidebar.classList.toggle('active');
-                    console.log("Sidebar active:", sidebar.classList.contains('active'));
-                }
-                
-                // Toggle overlay
-                if (sidebarOverlay) {
-                    sidebarOverlay.classList.toggle('active');
-                    console.log("Overlay active:", sidebarOverlay.classList.contains('active'));
-                }
-            }
-            
-            // Add click event to mobile menu toggle
-            if (mobileMenuToggle) {
-                mobileMenuToggle.addEventListener('click', function(e) {
-                    console.log("Mobile menu toggle clicked");
-                    toggleSidebar(e);
-                });
-            }
-            
-            // Close sidebar when clicking on overlay
-            if (sidebarOverlay) {
-                sidebarOverlay.addEventListener('click', function(e) {
-                    console.log("Overlay clicked");
-                    toggleSidebar(e);
-                });
-            }
-            
-            // Fix for sidebar links - more aggressive approach
-            function fixSidebarLinks() {
-                // Target all possible link elements in the sidebar
-                const allSidebarElements = document.querySelectorAll('#sidebar a, #sidebar .sidebar-btn, #sidebar .logout-btn, #sidebar .nav-link');
-                
-                allSidebarElements.forEach(element => {
-                    // Remove any event listeners that might be blocking clicks
-                    const newElement = element.cloneNode(true);
-                    if (element.parentNode) {
-                        element.parentNode.replaceChild(newElement, element);
-                    }
-                    
-                    // Apply styles directly to ensure clickability
-                    newElement.style.pointerEvents = 'auto';
-                    newElement.style.cursor = 'pointer';
-                    newElement.style.position = 'relative';
-                    newElement.style.zIndex = '1010';
-                    newElement.style.display = 'block';
-                    
-                    // Add a click handler to debug and ensure navigation
-                    newElement.addEventListener('click', function(e) {
-                        console.log("Link clicked:", this.textContent.trim(), "href:", this.getAttribute('href'));
-                        
-                        // If it's an anchor with href, ensure navigation works
-                        if (this.tagName === 'A' && this.getAttribute('href')) {
-                            window.location.href = this.getAttribute('href');
-                        }
-                    });
-                    
-                    console.log("Fixed link:", newElement.textContent.trim());
-                });
-            }
-            
-            // Call the fix function
-            fixSidebarLinks();
-            
-            // Also call it after a short delay to ensure it runs after any other scripts
-            setTimeout(fixSidebarLinks, 500);
-            
-            // Form validation
-            const form = document.querySelector('form');
-            
-            form.addEventListener('submit', function(event) {
-                let isValid = true;
-                const requiredInputs = form.querySelectorAll('[required]');
-                
-                requiredInputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.style.borderColor = 'var(--danger)';
-                    } else {
-                        input.style.borderColor = '#ddd';
-                    }
-                });
-                
-                if (!isValid) {
-                    event.preventDefault();
-                    alert('Please fill in all required fields.');
-                }
-            });
-        });
-    </script>
+    <!-- Include sidebar JavaScript -->
+    <script src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html> 

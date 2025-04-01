@@ -11,6 +11,9 @@ import json
 from django.db.models import Q
 from django.utils import timezone
 
+
+
+
 @login_required
 def dashboard(request):
     # Get the logged-in user's username
@@ -42,6 +45,7 @@ def dashboard(request):
             'receptive_evaluations': ReceptiveEvaluation.objects.all(),
             'cognitive_evaluations': CognitiveEvaluation.objects.all()
         }
+        context['debug'] = True
         return render(request, "PDash.html", context)
     else:
         # This is a teacher/admin
@@ -833,7 +837,137 @@ def ParentEvaluationCognitive(request, student_id=None):
         'message': 'Invalid request method. GET or POST required.'
     }, status=405)
 
-
-
-
-
+def comparison_view(request):
+    search_query = request.GET.get('search', '')
+    student_name = request.GET.get('student_name', '')
+    
+    # Get list of students for the search dropdown
+    students = set()
+    
+    # Collect student names from various evaluation tables
+    if search_query:
+        # Search across multiple evaluation tables with case-insensitive search
+        gross_students = GrossEvaluation.objects.filter(student_name__icontains=search_query).values_list('student_name', flat=True)
+        fine_students = FineEvaluation.objects.filter(student_name__icontains=search_query).values_list('student_name', flat=True)
+        self_help_students = SelfHelpEvaluation.objects.filter(student_name__icontains=search_query).values_list('student_name', flat=True)
+        cognitive_students = CognitiveEvaluation.objects.filter(student_name__icontains=search_query).values_list('student_name', flat=True)
+        
+        # Add to set to remove duplicates
+        students.update(gross_students)
+        students.update(fine_students)
+        students.update(self_help_students)
+        students.update(cognitive_students)
+        
+        # Sort the students alphabetically
+        students = sorted(students)
+    
+    # Only fetch evaluation data if a specific student is selected
+    if student_name:
+        # Fetch teacher evaluations
+        teacher_gross = GrossEvaluation.objects.filter(student_name=student_name).first()
+        teacher_fine = FineEvaluation.objects.filter(student_name=student_name).first()
+        teacher_self_help = SelfHelpEvaluation.objects.filter(student_name=student_name).first()
+        teacher_receptive = ReceptiveEvaluation.objects.filter(student_name=student_name).first()
+        teacher_expressive = ExpressiveEvaluation.objects.filter(student_name=student_name).first()
+        teacher_cognitive = CognitiveEvaluation.objects.filter(student_name=student_name).first()
+        
+        # Fetch parent evaluations
+        parent_gross = ParentGrossEvaluation.objects.filter(student_name=student_name).first()
+        parent_self_help = ParentSelfHelpEvaluation.objects.filter(student_name=student_name).first()
+        parent_social = ParentSocialEvaluation.objects.filter(student_name=student_name).first()
+        parent_expressive = ParentExpressiveEvaluation.objects.filter(student_name=student_name).first()
+        parent_cognitive = ParentCognitiveEvaluation.objects.filter(student_name=student_name).first()
+        
+        # Create data for JSON
+        teacher_data = {
+            'gross_motor': [
+                teacher_gross.eval1_score if teacher_gross else 0,
+                teacher_gross.eval2_score if teacher_gross else 0,
+                teacher_gross.eval3_score if teacher_gross else 0
+            ],
+            'fine_motor': [
+                teacher_fine.eval1_score if teacher_fine else 0,
+                teacher_fine.eval2_score if teacher_fine else 0,
+                teacher_fine.eval3_score if teacher_fine else 0
+            ],
+            'self_help': [
+                teacher_self_help.eval1_score if teacher_self_help else 0,
+                teacher_self_help.eval2_score if teacher_self_help else 0,
+                teacher_self_help.eval3_score if teacher_self_help else 0
+            ],
+            'receptive': [
+                teacher_receptive.eval1_score if teacher_receptive else 0,
+                teacher_receptive.eval2_score if teacher_receptive else 0,
+                teacher_receptive.eval3_score if teacher_receptive else 0
+            ],
+            'expressive': [
+                teacher_expressive.eval1_score if teacher_expressive else 0,
+                teacher_expressive.eval2_score if teacher_expressive else 0,
+                teacher_expressive.eval3_score if teacher_expressive else 0
+            ],
+            'cognitive': [
+                teacher_cognitive.eval1_score if teacher_cognitive else 0,
+                teacher_cognitive.eval2_score if teacher_cognitive else 0,
+                teacher_cognitive.eval3_score if teacher_cognitive else 0
+            ]
+        }
+        
+        parent_data = {
+            'gross_motor': [
+                parent_gross.eval1_score if parent_gross else 0,
+                parent_gross.eval2_score if parent_gross else 0,
+                parent_gross.eval3_score if parent_gross else 0
+            ],
+            'self_help': [
+                parent_self_help.eval1_score if parent_self_help else 0,
+                parent_self_help.eval2_score if parent_self_help else 0,
+                parent_self_help.eval3_score if parent_self_help else 0
+            ],
+            'social': [
+                parent_social.eval1_score if parent_social else 0,
+                parent_social.eval2_score if parent_social else 0,
+                parent_social.eval3_score if parent_social else 0
+            ],
+            'expressive': [
+                parent_expressive.eval1_score if parent_expressive else 0,
+                parent_expressive.eval2_score if parent_expressive else 0,
+                parent_expressive.eval3_score if parent_expressive else 0
+            ],
+            'cognitive': [
+                parent_cognitive.eval1_score if parent_cognitive else 0,
+                parent_cognitive.eval2_score if parent_cognitive else 0,
+                parent_cognitive.eval3_score if parent_cognitive else 0
+            ]
+        }
+        
+        context = {
+            'student_name': student_name,
+            'teacher_data_json': json.dumps(teacher_data),
+            'parent_data_json': json.dumps(parent_data),
+            'teacher_evaluations': {
+                'gross': teacher_gross,
+                'fine': teacher_fine,
+                'self_help': teacher_self_help,
+                'receptive': teacher_receptive,
+                'expressive': teacher_expressive,
+                'cognitive': teacher_cognitive
+            },
+            'parent_evaluations': {
+                'gross': parent_gross,
+                'self_help': parent_self_help,
+                'social': parent_social,
+                'expressive': parent_expressive,
+                'cognitive': parent_cognitive
+            },
+            'has_data': True
+        }
+    else:
+        context = {
+            'has_data': False
+        }
+    
+    # Always include these in the context
+    context['search_query'] = search_query
+    context['students'] = students
+    
+    return render(request, 'comparison.html', context)
