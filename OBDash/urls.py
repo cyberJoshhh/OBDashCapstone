@@ -56,4 +56,5 @@ urlpatterns = [
     path('parent-evaluation-cognitive/', ParentEvaluationCognitive, name='parent_evaluation_cognitive'),
     path('parent-evaluation-cognitive/<int:student_id>/', ParentEvaluationCognitive, name='parent_evaluation_cognitive_with_id'),
     path('comparison/', views.comparison_view, name='comparison_view'),
+    path('student-performance/', views.student_performance, name='student_performance'),
 ]

@@ -81,84 +81,92 @@
                         <th>2nd Eval (Parent)</th>
                         <th>3rd Eval (Teacher)</th>
                         <th>3rd Eval (Parent)</th>
+                        <th class="total-column">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Gross Motor -->
                     <tr>
                         <td><i class="fas fa-running" style="color: rgb(255, 99, 132);"></i> Gross Motor</td>
-                        <td>{{ teacher_evaluations.gross.eval1_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.gross.eval1_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.gross.eval2_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.gross.eval2_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.gross.eval3_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.gross.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.gross.eval1_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.gross.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.gross.eval2_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.gross.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.gross.eval3_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.gross.eval3_score|default:"0" }}</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Fine Motor (Teacher Only) -->
                     <tr>
                         <td><i class="fas fa-hand-paper" style="color: rgb(54, 162, 235);"></i> Fine Motor</td>
-                        <td>{{ teacher_evaluations.fine.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.fine.eval1_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ teacher_evaluations.fine.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.fine.eval2_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ teacher_evaluations.fine.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.fine.eval3_score|default:"0" }}</td>
                         <td>N/A</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Self Help -->
                     <tr>
                         <td><i class="fas fa-hands-helping" style="color: rgb(75, 192, 192);"></i> Self Help</td>
-                        <td>{{ teacher_evaluations.self_help.eval1_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.self_help.eval1_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.self_help.eval2_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.self_help.eval2_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.self_help.eval3_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.self_help.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.self_help.eval1_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.self_help.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.self_help.eval2_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.self_help.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.self_help.eval3_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.self_help.eval3_score|default:"0" }}</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Receptive Language (Teacher Only) -->
                     <tr>
                         <td><i class="fas fa-ear-listen" style="color: rgb(153, 102, 255);"></i> Receptive Language</td>
-                        <td>{{ teacher_evaluations.receptive.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.receptive.eval1_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ teacher_evaluations.receptive.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.receptive.eval2_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ teacher_evaluations.receptive.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.receptive.eval3_score|default:"0" }}</td>
                         <td>N/A</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Expressive Language -->
                     <tr>
                         <td><i class="fas fa-comments" style="color: rgb(255, 159, 64);"></i> Expressive Language</td>
-                        <td>{{ teacher_evaluations.expressive.eval1_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.expressive.eval1_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.expressive.eval2_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.expressive.eval2_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.expressive.eval3_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.expressive.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.expressive.eval1_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.expressive.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.expressive.eval2_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.expressive.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.expressive.eval3_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.expressive.eval3_score|default:"0" }}</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Cognitive -->
                     <tr>
                         <td><i class="fas fa-brain" style="color: rgb(255, 205, 86);"></i> Cognitive</td>
-                        <td>{{ teacher_evaluations.cognitive.eval1_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.cognitive.eval1_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.cognitive.eval2_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.cognitive.eval2_score|default:"0" }}</td>
-                        <td>{{ teacher_evaluations.cognitive.eval3_score|default:"0" }}</td>
-                        <td>{{ parent_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                        <td class="teacher-score">{{ teacher_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                        <td class="domain-total"></td>
                     </tr>
                     
                     <!-- Social-Emotional (Parent Only) -->
                     <tr>
                         <td><i class="fas fa-users" style="color: rgb(201, 203, 207);"></i> Social-Emotional</td>
                         <td>N/A</td>
-                        <td>{{ parent_evaluations.social.eval1_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.social.eval1_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ parent_evaluations.social.eval2_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.social.eval2_score|default:"0" }}</td>
                         <td>N/A</td>
-                        <td>{{ parent_evaluations.social.eval3_score|default:"0" }}</td>
+                        <td class="parent-score">{{ parent_evaluations.social.eval3_score|default:"0" }}</td>
+                        <td class="domain-total"></td>
                     </tr>
                 </tbody>
             </table>
@@ -169,17 +177,6 @@
             <h3>Comparison Chart</h3>
             <div class="chart-container">
                 <canvas id="comparisonChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Add a debug section (can be hidden in production) -->
-        <div class="debug-section" style="margin-top: 50px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-            <h3>Debug Section</h3>
-            <button id="toggleDebug" class="btn btn-secondary">Show Debug Info</button>
-            
-            <div style="margin-top: 15px;">
-                <button id="checkDataBtn" class="btn btn-info">Check Hidden Data</button>
-                <div id="dataDisplay" style="display: none; margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 5px;"></div>
             </div>
         </div>
     </div>
@@ -204,8 +201,35 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Teacher Data:', teacherData);
     console.log('Parent Data:', parentData);
     
+    // Calculate domain totals for each row
+    calculateDomainTotals();
+    
     // Create comparison chart
     const ctx = document.getElementById('comparisonChart').getContext('2d');
+    
+    // Function to calculate totals for each domain row
+    function calculateDomainTotals() {
+        const rows = document.querySelectorAll('.comparison-table tbody tr');
+        
+        rows.forEach(row => {
+            let total = 0;
+            const scoreElements = row.querySelectorAll('.teacher-score, .parent-score');
+            
+            scoreElements.forEach(cell => {
+                // Get the score value, convert to number
+                const scoreValue = cell.textContent.trim();
+                if (scoreValue !== 'N/A' && !isNaN(scoreValue)) {
+                    total += parseInt(scoreValue, 10);
+                }
+            });
+            
+            // Update the total cell for this row
+            const totalCell = row.querySelector('.domain-total');
+            if (totalCell) {
+                totalCell.textContent = total;
+            }
+        });
+    }
     
     // Prepare datasets for chart
     const datasets = [];
@@ -313,37 +337,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
-    // Debug button functionality
-    const checkDataBtn = document.getElementById('checkDataBtn');
-    const dataDisplay = document.getElementById('dataDisplay');
-    
-    checkDataBtn.addEventListener('click', function() {
-        dataDisplay.style.display = 'block';
-        dataDisplay.innerHTML = '<h4>Data from Hidden Fields:</h4>' + 
-            '<h5>Teacher Data:</h5>' +
-            '<pre>' + JSON.stringify(teacherData, null, 2) + '</pre>' +
-            '<h5>Parent Data:</h5>' +
-            '<pre>' + JSON.stringify(parentData, null, 2) + '</pre>';
-    });
-    
-    // Toggle debug section
-    const toggleDebugBtn = document.getElementById('toggleDebug');
-    const debugSection = document.querySelector('.debug-section');
-    
-    toggleDebugBtn.addEventListener('click', function() {
-        const debugContent = dataDisplay;
-        if (debugContent.style.display === 'none') {
-            debugContent.style.display = 'block';
-            toggleDebugBtn.textContent = 'Hide Debug Info';
-        } else {
-            debugContent.style.display = 'none';
-            toggleDebugBtn.textContent = 'Show Debug Info';
-        }
-    });
-    
-    // Initially hide the debug content
-    dataDisplay.style.display = 'none';
     {% endif %}
 });
 </script>
@@ -392,6 +385,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     .comparison-table {
         width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .comparison-table th, .comparison-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .comparison-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .comparison-table td:first-child {
+        text-align: left;
+        font-weight: 500;
+        min-width: 180px;
+    }
+    
+    /* Total row styling */
+    .comparison-table .total-row {
+        background-color: #f0f7f4;
+        font-weight: bold;
+    }
+    
+    .comparison-table .total-row td {
+        border-top: 2px solid #2d6a4f;
+        border-bottom: 2px solid #2d6a4f;
+    }
+    
+    /* Total column styling */
+    .comparison-table .total-column {
+        background-color: #2d6a4f;
+        color: white;
+    }
+    
+    .comparison-table .domain-total {
+        background-color: #f0f7f4;
+        font-weight: bold;
+        border-left: 2px solid #2d6a4f;
     }
     
     /* Improved responsive design */
@@ -575,31 +612,6 @@ document.addEventListener('DOMContentLoaded', function() {
         color: #2d6a4f;
         margin-bottom: 20px;
         font-weight: 500;
-    }
-    
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .comparison-table th, .comparison-table td {
-        padding: 12px 15px;
-        text-align: center;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .comparison-table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .comparison-table td:first-child {
-        text-align: left;
-        font-weight: 500;
-        min-width: 180px;
     }
     
     .chart-section {

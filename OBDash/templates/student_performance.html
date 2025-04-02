@@ -1,0 +1,576 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<!-- Add Font Awesome and Google Fonts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/pdash.css' %}">
+
+<div class="dashboard-container">
+    <!-- Top Navigation with Back Button and Student Name -->
+    <div class="top-navigation">
+        <a href="{% url 'student_performance' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Search
+        </a>
+        {% if student_name %}
+        <div class="student-name-display">
+            <i class="fas fa-user-graduate"></i>
+            <h2>{{ student_name }}</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if has_data %}
+    <div class="dashboard-cards">
+        <!-- Overall Summary Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>{{ student_name }}'s Overall Performance</h3>
+            </div>
+            <div class="card-body">
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>1st Eval (Teacher)</th>
+                            <th>1st Eval (Parent)</th>
+                            <th>2nd Eval (Teacher)</th>
+                            <th>2nd Eval (Parent)</th>
+                            <th>3rd Eval (Teacher)</th>
+                            <th>3rd Eval (Parent)</th>
+                            <th class="total-column">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <i class="fas fa-running" style="color: rgb(255, 99, 132);"></i> Gross Motor
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-hand-paper" style="color: rgb(54, 162, 235);"></i> Fine Motor
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval3_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-hands-helping" style="color: rgb(75, 192, 192);"></i> Self Help
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-ear-listen" style="color: rgb(153, 102, 255);"></i> Receptive Language
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval3_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-comments" style="color: rgb(255, 159, 64);"></i> Expressive Language
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-brain" style="color: rgb(255, 205, 86);"></i> Cognitive
+                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-users" style="color: rgb(201, 203, 207);"></i> Social-Emotional
+                            </td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
+                        <!-- Total Row -->
+                        <tr class="total-row">
+                            <td><strong>Evaluation Totals</strong></td>
+                            <td><strong>{{ teacher_eval1_total }}</strong></td>
+                            <td><strong>{{ parent_eval1_total }}</strong></td>
+                            <td><strong>{{ teacher_eval2_total }}</strong></td>
+                            <td><strong>{{ parent_eval2_total }}</strong></td>
+                            <td><strong>{{ teacher_eval3_total }}</strong></td>
+                            <td><strong>{{ parent_eval3_total }}</strong></td>
+                            <td class="grand-total">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Progress Visualization Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Progress Visualization</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 600;">Development Domains Progress</h4>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overall Performance Summary Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-star"></i></div>
+                <h3>Overall Performance Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="overall-metrics">
+                    <!-- Progress Metrics -->
+                    <div class="progress-metrics">
+                        <div class="metric-box teacher-metric">
+                            <div class="metric-title">
+                                <i class="fas fa-chalkboard-teacher"></i> Teacher Assessment
+                            </div>
+                            <div class="metric-values">
+                                <div class="metric-item">
+                                    <span class="label">1st Evaluation:</span>
+                                    <span class="value">{{ teacher_eval1_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">2nd Evaluation:</span>
+                                    <span class="value">{{ teacher_eval2_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">3rd Evaluation:</span>
+                                    <span class="value">{{ teacher_eval3_total }}</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress" id="teacherProgress" style="width: {{ progress_data.teacher_progress }}%;"></div>
+                                    </div>
+                                    <div class="progress-text" id="teacherProgressText">{{ progress_data.teacher_progress|floatformat:1 }}% improvement</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-box parent-metric">
+                            <div class="metric-title">
+                                <i class="fas fa-home"></i> Parent Assessment
+                            </div>
+                            <div class="metric-values">
+                                <div class="metric-item">
+                                    <span class="label">1st Evaluation:</span>
+                                    <span class="value">{{ parent_eval1_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">2nd Evaluation:</span>
+                                    <span class="value">{{ parent_eval2_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">3rd Evaluation:</span>
+                                    <span class="value">{{ parent_eval3_total }}</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress" id="parentProgress" style="width: {{ progress_data.parent_progress }}%;"></div>
+                                    </div>
+                                    <div class="progress-text" id="parentProgressText">{{ progress_data.parent_progress|floatformat:1 }}% improvement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Combined Progress Gauge -->
+                    <div class="combined-progress">
+                        <h4>Combined Progress</h4>
+                        <div class="gauge-container">
+                            <canvas id="progressGauge"></canvas>
+                        </div>
+                        <div class="overall-score" id="overallScore">
+                            <span id="scoreValue">{{ progress_data.teacher_progress|add:progress_data.parent_progress|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert-container">
+        <div class="alert alert-warning">
+            {% if error_message %}
+                <i class="fas fa-exclamation-triangle"></i> {{ error_message }}
+            {% else %}
+                <i class="fas fa-exclamation-triangle"></i> No student performance data found.
+            {% endif %}
+            <p class="mt-3">
+                <a href="{% url 'student_performance' %}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search for a different student
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if has_data %}
+    // Calculate domain totals
+    calculateTotals();
+    
+    // Function to calculate totals
+    function calculateTotals() {
+        // Calculate domain totals
+        const rows = document.querySelectorAll('.performance-table tbody tr:not(.total-row)');
+        let grandTotal = 0;
+        
+        rows.forEach(row => {
+            let total = 0;
+            const scoreElements = row.querySelectorAll('.teacher-score, .parent-score');
+            
+            scoreElements.forEach(cell => {
+                // Get the score value, convert to number
+                const scoreValue = cell.textContent.trim();
+                if (scoreValue !== 'N/A' && !isNaN(scoreValue)) {
+                    total += parseInt(scoreValue, 10);
+                }
+            });
+            
+            // Update the total cell for this row
+            const totalCell = row.querySelector('.domain-total');
+            if (totalCell) {
+                totalCell.textContent = total;
+                grandTotal += total;
+            }
+        });
+        
+        // Update grand total
+        const grandTotalCell = document.querySelector('.grand-total');
+        if (grandTotalCell) {
+            grandTotalCell.textContent = grandTotal;
+        }
+    }
+    
+    // Performance Chart
+    const ctx = document.getElementById('performanceChart')?.getContext('2d');
+    if (ctx) {
+        const labels = ['1st Evaluation', '2nd Evaluation', '3rd Evaluation'];
+        const domainColors = {
+            'Gross Motor': 'rgb(255, 99, 132)',
+            'Fine Motor': 'rgb(54, 162, 235)',
+            'Self Help': 'rgb(75, 192, 192)',
+            'Receptive Language': 'rgb(153, 102, 255)',
+            'Expressive Language': 'rgb(255, 159, 64)',
+            'Cognitive': 'rgb(255, 205, 86)',
+            'Social-Emotional': 'rgb(201, 203, 207)'
+        };
+        
+        const teacherData = {{ teacher_data_json|safe }};
+        const datasets = [];
+        
+        // Add datasets for each domain
+        if (teacherData.gross_motor) {
+            datasets.push({
+                label: 'Gross Motor',
+                data: teacherData.gross_motor,
+                borderColor: domainColors['Gross Motor'],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        if (teacherData.fine_motor) {
+            datasets.push({
+                label: 'Fine Motor',
+                data: teacherData.fine_motor,
+                borderColor: domainColors['Fine Motor'],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        if (teacherData.self_help) {
+            datasets.push({
+                label: 'Self Help',
+                data: teacherData.self_help,
+                borderColor: domainColors['Self Help'],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        if (teacherData.receptive) {
+            datasets.push({
+                label: 'Receptive Language',
+                data: teacherData.receptive,
+                borderColor: domainColors['Receptive Language'],
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        if (teacherData.expressive) {
+            datasets.push({
+                label: 'Expressive Language',
+                data: teacherData.expressive,
+                borderColor: domainColors['Expressive Language'],
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        if (teacherData.cognitive) {
+            datasets.push({
+                label: 'Cognitive',
+                data: teacherData.cognitive,
+                borderColor: domainColors['Cognitive'],
+                backgroundColor: 'rgba(255, 205, 86, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        const parentData = {{ parent_data_json|safe }};
+        if (parentData.social) {
+            datasets.push({
+                label: 'Social-Emotional',
+                data: parentData.social,
+                borderColor: domainColors['Social-Emotional'],
+                backgroundColor: 'rgba(201, 203, 207, 0.2)',
+                borderWidth: 3,
+                tension: 0.3
+            });
+        }
+        
+        // Create the chart
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: "'Poppins', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            family: "'Poppins', sans-serif",
+                            size: 14
+                        },
+                        bodyFont: {
+                            family: "'Poppins', sans-serif",
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    }
+    
+    // Progress Gauge
+    const gaugeCtx = document.getElementById('progressGauge')?.getContext('2d');
+    if (gaugeCtx) {
+        // Calculate overall progress
+        const teacherProgress = {{ progress_data.teacher_progress|safe }};
+        const parentProgress = {{ progress_data.parent_progress|safe }};
+        const overallProgress = (teacherProgress + parentProgress) / 2;
+        
+        // Determine color based on progress
+        const gaugeColor = overallProgress >= 75 ? '#4caf50' : 
+                        overallProgress >= 50 ? '#ff9800' : 
+                        '#f44336';
+        
+        // Create gauge chart
+        const gaugeChart = new Chart(gaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [overallProgress, 100 - overallProgress],
+                    backgroundColor: [
+                        gaugeColor,
+                        '#e9ecef'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '75%',
+                circumference: 180,
+                rotation: 270,
+                plugins: {
+                    tooltip: {
+                        enabled: false
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // Update score value color
+        const scoreValue = document.getElementById('scoreValue');
+        if (scoreValue) {
+            scoreValue.style.color = gaugeColor;
+        }
+    }
+    {% endif %}
+});
+</script>
+
+<!-- Additional Styles -->
+<style>
+    .top-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+    
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        color: #333;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .back-button:hover {
+        background-color: #e9ecef;
+        color: #2d6a4f;
+    }
+    
+    .back-button i {
+        margin-right: 8px;
+    }
+    
+    .student-name-display {
+        display: flex;
+        align-items: center;
+    }
+    
+    .student-name-display i {
+        font-size: 1.5rem;
+        color: #2d6a4f;
+        margin-right: 10px;
+    }
+    
+    .student-name-display h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+    }
+    
+    .alert-container {
+        padding: 30px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .alert {
+        max-width: 600px;
+        text-align: center;
+        padding: 30px;
+        border-radius: 10px;
+    }
+    
+    .alert i {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    /* Override some styles for a cleaner look */
+    .dashboard-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %} 

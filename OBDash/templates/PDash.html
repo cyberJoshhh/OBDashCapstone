@@ -11,6 +11,9 @@
     <div class="welcome-header">
         <div class="welcome-text">
             Welcome <span>{{ request.user.username }}</span>, here's your child's progress report
+            {% if student_name %}
+            <div class="student-name">Student: <strong>{{ student_name }}</strong></div>
+            {% endif %}
         </div>
     </div>
     <!-- Add this button for mobile menu toggle -->
@@ -40,7 +43,7 @@
                 <span>Messages</span>
                 <span class="notification-badge"></span>
             </a>
-            <a href="{% url 'evaluation_self' %}" class="sidebar-btn">
+            <a href="{% url 'evaluation_gross' %}" class="sidebar-btn">
                 <i class="fas fa-chart-bar"></i>
                 <span>Evaluation</span>
             </a>
@@ -51,21 +54,33 @@
         </div>
     </div>
 
+    <!-- Hidden values for JavaScript -->
+    <input type="hidden" id="teacher_eval1_total" value="{{ teacher_eval1_total|default:'0' }}">
+    <input type="hidden" id="teacher_eval2_total" value="{{ teacher_eval2_total|default:'0' }}">
+    <input type="hidden" id="teacher_eval3_total" value="{{ teacher_eval3_total|default:'0' }}">
+    <input type="hidden" id="parent_eval1_total" value="{{ parent_eval1_total|default:'0' }}">
+    <input type="hidden" id="parent_eval2_total" value="{{ parent_eval2_total|default:'0' }}">
+    <input type="hidden" id="parent_eval3_total" value="{{ parent_eval3_total|default:'0' }}">
+
     {% if student %}
     <div class="dashboard-cards">
         <div class="dashboard-card">
             <div class="card-header">
                 <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
-                <h3>{{ student.child_name }}'s Performance (Teacher's Evaluation)</h3>
+                <h3>{{ student.child_name }}'s Overall Performance</h3>
             </div>
             <div class="card-body">
                 <table class="performance-table">
                     <thead>
                         <tr>
                             <th>Domain</th>
-                            <th>1st Eval</th>
-                            <th>2nd Eval</th>
-                            <th>3rd Eval</th>
+                            <th>1st Eval (Teacher)</th>
+                            <th>1st Eval (Parent)</th>
+                            <th>2nd Eval (Teacher)</th>
+                            <th>2nd Eval (Parent)</th>
+                            <th>3rd Eval (Teacher)</th>
+                            <th>3rd Eval (Parent)</th>
+                            <th class="total-column">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,213 +88,86 @@
                             <td>
                                 <i class="fas fa-running" style="color: rgb(255, 99, 132);"></i> Gross Motor
                             </td>
-                            <td>
-                                {% for eval in gross_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/10</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval1_score 10 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in gross_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/10</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval2_score 10 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in gross_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/10</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-gross" style="width: {% widthratio eval.eval3_score 10 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.gross.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.gross.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
                         </tr>
                         <tr>
                             <td>
                                 <i class="fas fa-hand-paper" style="color: rgb(54, 162, 235);"></i> Fine Motor
                             </td>
-                            <td>
-                                {% for eval in fine_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/11</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval1_score 11 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in fine_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/11</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval2_score 11 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in fine_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/11</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-fine" style="width: {% widthratio eval.eval3_score 11 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.fine.eval3_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="domain-total"></td>
                         </tr>
                         <tr>
                             <td>
                                 <i class="fas fa-hands-helping" style="color: rgb(75, 192, 192);"></i> Self Help
                             </td>
-                            <td>
-                                {% for eval in self_help_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/8</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval1_score 8 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in self_help_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/8</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval2_score 8 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in self_help_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/8</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-self" style="width: {% widthratio eval.eval3_score 8 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.self_help.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
                         </tr>
                         <tr>
                             <td>
                                 <i class="fas fa-ear-listen" style="color: rgb(153, 102, 255);"></i> Receptive Language
                             </td>
-                            <td>
-                                {% for eval in receptive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/5</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval1_score 5 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in receptive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/5</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval2_score 5 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in receptive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/5</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-receptive" style="width: {% widthratio eval.eval3_score 5 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval3_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="domain-total"></td>
                         </tr>
                         <tr>
                             <td>
                                 <i class="fas fa-comments" style="color: rgb(255, 159, 64);"></i> Expressive Language
                             </td>
-                            <td>
-                                {% for eval in expressive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/2</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval1_score 2 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in expressive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/2</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval2_score 2 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in expressive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/2</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-expressive" style="width: {% widthratio eval.eval3_score 2 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.expressive.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
                         </tr>
                         <tr>
                             <td>
                                 <i class="fas fa-brain" style="color: rgb(255, 205, 86);"></i> Cognitive
                             </td>
-                            <td>
-                                {% for eval in cognitive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval1_score }}/19</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval1_score 19 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in cognitive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval2_score }}/19</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval2_score 19 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for eval in cognitive_evaluations %}
-                                    {% if eval.student_name == student.child_name %}
-                                        <div class="score-pill">{{ eval.eval3_score }}/19</div>
-                                        <div class="progress-indicator">
-                                            <div class="progress-bar progress-cognitive" style="width: {% widthratio eval.eval3_score 19 100 %}%"></div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval1_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval2_score|default:"0" }}</td>
+                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                            <td class="parent-score">{{ parent_evaluations.cognitive.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
                         </tr>
-                    
+                        <tr>
+                            <td>
+                                <i class="fas fa-users" style="color: rgb(201, 203, 207);"></i> Social-Emotional
+                            </td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval1_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval2_score|default:"0" }}</td>
+                            <td>N/A</td>
+                            <td class="parent-score">{{ parent_evaluations.social.eval3_score|default:"0" }}</td>
+                            <td class="domain-total"></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -325,6 +213,83 @@
                 </div>
             </div>
         </div>
+        
+        <!-- New Overall Performance Summary Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="domain-icon"><i class="fas fa-star"></i></div>
+                <h3>Overall Performance Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="overall-metrics">
+                    <!-- Progress Metrics -->
+                    <div class="progress-metrics">
+                        <div class="metric-box teacher-metric">
+                            <div class="metric-title">
+                                <i class="fas fa-chalkboard-teacher"></i> Teacher Assessment
+                            </div>
+                            <div class="metric-values">
+                                <div class="metric-item">
+                                    <span class="label">1st Evaluation:</span>
+                                    <span class="value">{{ teacher_eval1_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">2nd Evaluation:</span>
+                                    <span class="value">{{ teacher_eval2_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">3rd Evaluation:</span>
+                                    <span class="value">{{ teacher_eval3_total }}</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress" id="teacherProgress"></div>
+                                    </div>
+                                    <div class="progress-text" id="teacherProgressText"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-box parent-metric">
+                            <div class="metric-title">
+                                <i class="fas fa-home"></i> Parent Assessment
+                            </div>
+                            <div class="metric-values">
+                                <div class="metric-item">
+                                    <span class="label">1st Evaluation:</span>
+                                    <span class="value">{{ parent_eval1_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">2nd Evaluation:</span>
+                                    <span class="value">{{ parent_eval2_total }}</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">3rd Evaluation:</span>
+                                    <span class="value">{{ parent_eval3_total }}</span>
+                                </div>
+                                <div class="metric-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress" id="parentProgress"></div>
+                                    </div>
+                                    <div class="progress-text" id="parentProgressText"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Combined Progress Gauge -->
+                    <div class="combined-progress">
+                        <h4>Combined Progress</h4>
+                        <div class="gauge-container">
+                            <canvas id="progressGauge"></canvas>
+                        </div>
+                        <div class="overall-score" id="overallScore">
+                            <span id="scoreValue"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div> 
     {% else %}
     <div class="alert">
@@ -338,6 +303,42 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // Calculate domain totals and grand total
+    calculateTotals();
+    
+    // Function to calculate totals
+    function calculateTotals() {
+        // Calculate domain totals
+        const rows = document.querySelectorAll('.performance-table tbody tr:not(.total-row)');
+        let grandTotal = 0;
+        
+        rows.forEach(row => {
+            let total = 0;
+            const scoreElements = row.querySelectorAll('.teacher-score, .parent-score');
+            
+            scoreElements.forEach(cell => {
+                // Get the score value, convert to number
+                const scoreValue = cell.textContent.trim();
+                if (scoreValue !== 'N/A' && !isNaN(scoreValue)) {
+                    total += parseInt(scoreValue, 10);
+                }
+            });
+            
+            // Update the total cell for this row
+            const totalCell = row.querySelector('.domain-total');
+            if (totalCell) {
+                totalCell.textContent = total;
+                grandTotal += total;
+            }
+        });
+        
+        // Update grand total
+        const grandTotalCell = document.querySelector('.grand-total');
+        if (grandTotalCell) {
+            grandTotalCell.textContent = grandTotal;
+        }
+    }
     
     const labels = ['1st Evaluation', '2nd Evaluation', '3rd Evaluation'];
     const datasets = [];
@@ -668,49 +669,175 @@ document.addEventListener('DOMContentLoaded', function() {
             '<pre>' + JSON.stringify(parentData, null, 2) + '</pre>';
     });
 
+    // Overall Performance Summary Card functionality
+    function updateProgressBars() {
+        // Teacher progress
+        const teacherEval1 = parseInt(document.getElementById('teacher_eval1_total').value || 0);
+        const teacherEval3 = parseInt(document.getElementById('teacher_eval3_total').value || 0);
+        const teacherProgress = document.getElementById('teacherProgress');
+        const teacherProgressText = document.getElementById('teacherProgressText');
+        
+        // Parent progress
+        const parentEval1 = parseInt(document.getElementById('parent_eval1_total').value || 0);
+        const parentEval3 = parseInt(document.getElementById('parent_eval3_total').value || 0);
+        const parentProgress = document.getElementById('parentProgress');
+        const parentProgressText = document.getElementById('parentProgressText');
+        
+        console.log('Teacher values:', teacherEval1, teacherEval3);
+        console.log('Parent values:', parentEval1, parentEval3);
+        
+        // Calculate progress percentages
+        let teacherProgressPct = 0;
+        let parentProgressPct = 0;
+        
+        if (teacherEval1 > 0) {
+            teacherProgressPct = ((teacherEval3 - teacherEval1) / teacherEval1) * 100;
+            teacherProgressPct = Math.max(0, teacherProgressPct); // Don't show negative progress
+        }
+        
+        if (parentEval1 > 0) {
+            parentProgressPct = ((parentEval3 - parentEval1) / parentEval1) * 100;
+            parentProgressPct = Math.max(0, parentProgressPct); // Don't show negative progress
+        }
+        
+        console.log('Teacher progress %:', teacherProgressPct);
+        console.log('Parent progress %:', parentProgressPct);
+        
+        // Cap progress percentage to 100% for visual purposes
+        const teacherProgressWidth = Math.min(100, teacherProgressPct);
+        const parentProgressWidth = Math.min(100, parentProgressPct);
+        
+        // Animate progress bars
+        setTimeout(() => {
+            teacherProgress.style.width = teacherProgressWidth + '%';
+            parentProgress.style.width = parentProgressWidth + '%';
+            
+            // Update text
+            teacherProgressText.textContent = teacherProgressPct.toFixed(1) + '% improvement';
+            parentProgressText.textContent = parentProgressPct.toFixed(1) + '% improvement';
+        }, 300);
+        
+        // Create combined progress gauge
+        createProgressGauge(teacherProgressPct, parentProgressPct);
+    }
+    
+    function createProgressGauge(teacherPct, parentPct) {
+        // Calculate overall progress
+        const overallProgress = (teacherPct + parentPct) / 2;
+        
+        // Get the canvas element
+        const gaugeCtx = document.getElementById('progressGauge').getContext('2d');
+        
+        // Create a gauge chart using Chart.js
+        const gaugeChart = new Chart(gaugeCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [overallProgress, 100 - overallProgress],
+                    backgroundColor: [
+                        overallProgress >= 75 ? '#4caf50' : // Green for high progress
+                            overallProgress >= 50 ? '#ff9800' : // Orange for medium progress
+                            '#f44336', // Red for low progress
+                        '#e9ecef'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '75%',
+                circumference: 180,
+                rotation: 270,
+                plugins: {
+                    tooltip: {
+                        enabled: false
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // Update the progress text
+        const scoreValue = document.getElementById('scoreValue');
+        scoreValue.textContent = overallProgress.toFixed(1) + '%';
+        scoreValue.style.color = overallProgress >= 75 ? '#4caf50' : 
+                               overallProgress >= 50 ? '#ff9800' : 
+                               '#f44336';
+    }
+    
+    // Initialize progress bars and gauge when page loads
+    if (document.getElementById('teacherProgress')) {
+        updateProgressBars();
+    }
+
     // Toggle debug section
     const toggleDebugBtn = document.getElementById('toggleDebug');
     const debugSection = document.querySelector('.debug-section');
     
-    toggleDebugBtn.addEventListener('click', function() {
-        if (debugSection.style.display === 'none') {
-            debugSection.style.display = 'block';
-            toggleDebugBtn.textContent = 'Hide Debug Info';
-        } else {
-            debugSection.style.display = 'none';
-            toggleDebugBtn.textContent = 'Show Debug Info';
-        }
-    });
+    if (toggleDebugBtn && debugSection) {
+        toggleDebugBtn.addEventListener('click', function() {
+            if (debugSection.style.display === 'none') {
+                debugSection.style.display = 'block';
+                toggleDebugBtn.textContent = 'Hide Debug Info';
+            } else {
+                debugSection.style.display = 'none';
+                toggleDebugBtn.textContent = 'Show Debug Info';
+            }
+        });
+    }
     
     // Check hidden fields
     const checkHiddenFieldsBtn = document.getElementById('checkHiddenFields');
     const hiddenFieldsOutput = document.getElementById('hiddenFieldsOutput');
     
-    checkHiddenFieldsBtn.addEventListener('click', function() {
-        const hiddenFields = {
-            'Gross Motor': document.getElementById('parent_gross_scores').value,
-            'Self Help': document.getElementById('parent_self_help_scores').value,
-            'Social': document.getElementById('parent_social_scores').value,
-            'Expressive': document.getElementById('parent_expressive_scores').value,
-            'Cognitive': document.getElementById('parent_cognitive_scores').value
-        };
-        
-        // Display the data
-        hiddenFieldsOutput.style.display = 'block';
-        hiddenFieldsOutput.innerHTML = '';
-        
-        for (const [key, value] of Object.entries(hiddenFields)) {
-            const row = document.createElement('div');
-            row.style.margin = '5px 0';
-            row.innerHTML = `<strong>${key}:</strong> ${value || 'No data'}`;
-            hiddenFieldsOutput.appendChild(row);
-        }
-    });
+    if (checkHiddenFieldsBtn && hiddenFieldsOutput) {
+        checkHiddenFieldsBtn.addEventListener('click', function() {
+            const hiddenFields = {
+                'Teacher Eval 1': document.getElementById('teacher_eval1_total')?.value || 'Not found',
+                'Teacher Eval 2': document.getElementById('teacher_eval2_total')?.value || 'Not found',
+                'Teacher Eval 3': document.getElementById('teacher_eval3_total')?.value || 'Not found',
+                'Parent Eval 1': document.getElementById('parent_eval1_total')?.value || 'Not found',
+                'Parent Eval 2': document.getElementById('parent_eval2_total')?.value || 'Not found',
+                'Parent Eval 3': document.getElementById('parent_eval3_total')?.value || 'Not found'
+            };
+            
+            // Display the data
+            hiddenFieldsOutput.style.display = 'block';
+            hiddenFieldsOutput.innerHTML = '';
+            
+            for (const [key, value] of Object.entries(hiddenFields)) {
+                const row = document.createElement('div');
+                row.style.margin = '5px 0';
+                row.innerHTML = `<strong>${key}:</strong> ${value || 'No data'}`;
+                hiddenFieldsOutput.appendChild(row);
+            }
+        });
+    }
     
     // Initially hide the debug section
-    debugSection.style.display = 'none';
+    if (debugSection) {
+        debugSection.style.display = 'none';
+    }
 });
 </script>
+
+<!-- Add a debug section for troubleshooting -->
+<div class="debug-section" style="margin: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; display: none;">
+    <h3>Debug Information</h3>
+    <button id="toggleDebug" class="btn btn-sm btn-secondary">Show Debug Info</button>
+    
+    <div style="margin-top: 20px;">
+        <button id="checkHiddenFields" class="btn btn-sm btn-info">Check Hidden Fields</button>
+        <div id="hiddenFieldsOutput" style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 5px; display: none;"></div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button id="checkDataBtn" class="btn btn-sm btn-info">Check Parent Data</button>
+        <div id="dataDisplay" style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 5px; display: none;"></div>
+    </div>
+</div>
 
 <!-- Add this CSS to your head section -->
 <style>
@@ -735,20 +862,95 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Dashboard cards container */
     .dashboard-cards {
         display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
+        flex-direction: column;
+        gap: 30px;
         margin-left: 250px; /* Add margin to account for sidebar width */
         margin-right: 20px; /* Add right margin for better spacing */
         padding: 0;
     }
     
     .dashboard-card {
-        flex: 1;
-        min-width: 350px; /* Increase minimum width */
+        width: 100%;
+        min-width: 100%;
         background-color: white;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    /* Card header styles */
+    .card-header {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #2d6a4f;
+    }
+
+    /* Card body styles */
+    .card-body {
+        padding: 25px;
+    }
+
+    /* Chart container styles */
+    .chart-container {
+        width: 100%;
+        height: 500px;
+        margin: 0 auto;
+    }
+
+    /* Performance table styles */
+    .performance-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .performance-table th,
+    .performance-table td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #eee;
+    }
+
+    .performance-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    /* Total column styling */
+    .performance-table .total-column {
+        background-color: #2d6a4f;
+        color: white;
+    }
+    
+    .performance-table .domain-total {
+        background-color: #f0f7f4;
+        font-weight: bold;
+        border-left: 2px solid #2d6a4f;
+    }
+
+    /* Total row styling */
+    .performance-table .total-row {
+        background-color: #f0f7f4;
+        font-weight: bold;
+    }
+    
+    .performance-table .total-row td {
+        border-top: 2px solid #2d6a4f;
+        border-bottom: 2px solid #2d6a4f;
+    }
+    
+    .performance-table .grand-total {
+        background-color: #2d6a4f;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
     }
 
     /* Sidebar Styles */
@@ -838,6 +1040,144 @@ document.addEventListener('DOMContentLoaded', function() {
         display: none;
     }
     
+    /* Overall Performance Summary Card Styles */
+    .overall-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+    
+    .progress-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .metric-box {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .teacher-metric {
+        border-left: 4px solid #2d6a4f;
+    }
+    
+    .parent-metric {
+        border-left: 4px solid #1a759f;
+    }
+    
+    .metric-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+    
+    .metric-title i {
+        margin-right: 10px;
+        color: #2d6a4f;
+    }
+    
+    .parent-metric .metric-title i {
+        color: #1a759f;
+    }
+    
+    .metric-values {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .metric-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    
+    .metric-item .label {
+        color: #666;
+    }
+    
+    .metric-item .value {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .metric-progress {
+        margin-top: 15px;
+    }
+    
+    .progress-bar {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .progress {
+        height: 100%;
+        background-color: #2d6a4f;
+        border-radius: 5px;
+        width: 0;
+        transition: width 1.5s ease-in-out;
+    }
+    
+    .parent-metric .progress {
+        background-color: #1a759f;
+    }
+    
+    .progress-text {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .combined-progress {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .combined-progress h4 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #2d6a4f;
+        font-weight: 600;
+    }
+    
+    .gauge-container {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+    }
+    
+    .overall-score {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    #scoreValue {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d6a4f;
+    }
+    
     /* Responsive Styles */
     @media (max-width: 768px) {
         .sidebar {
@@ -866,6 +1206,10 @@ document.addEventListener('DOMContentLoaded', function() {
             margin-left: 0;
             margin-right: 0;
             padding: 0 10px;
+        }
+        
+        .overall-metrics {
+            flex-direction: column;
         }
     }
 </style>
