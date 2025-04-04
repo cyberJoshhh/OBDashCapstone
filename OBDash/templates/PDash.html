@@ -8,14 +8,6 @@
 <link rel="stylesheet" href="{% static 'css/pdash.css' %}">
 
 <div class="dashboard-container">
-    <div class="welcome-header">
-        <div class="welcome-text">
-            Welcome <span>{{ request.user.username }}</span>, here's your child's progress report
-            {% if student_name %}
-            <div class="student-name">Student: <strong>{{ student_name }}</strong></div>
-            {% endif %}
-        </div>
-    </div>
     <!-- Add this button for mobile menu toggle -->
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
@@ -30,13 +22,17 @@
             <h3>OB Pagsasarili</h3>
         </div>
         <div class="sidebar-content">
-            <a href="#" class="sidebar-btn">
+            <a href="{% url 'dashboard' %}" class="sidebar-btn active">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="sidebar-btn">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
+            <a href="{% url 'student_profile' %}" class="sidebar-btn">
+                <i class="fas fa-user"></i>
+                <span>Student Profile</span>
+            </a>
+            <a href="{% url 'student_performance' %}" class="sidebar-btn">
+                <i class="fas fa-chart-line"></i>
+                <span>Performance Report</span>
             </a>
             <a href="#" class="sidebar-btn">
                 <i class="fas fa-envelope"></i>
@@ -54,905 +50,85 @@
         </div>
     </div>
 
-    <!-- Hidden values for JavaScript -->
-    <input type="hidden" id="teacher_eval1_total" value="{{ teacher_eval1_total|default:'0' }}">
-    <input type="hidden" id="teacher_eval2_total" value="{{ teacher_eval2_total|default:'0' }}">
-    <input type="hidden" id="teacher_eval3_total" value="{{ teacher_eval3_total|default:'0' }}">
-    <input type="hidden" id="parent_eval1_total" value="{{ parent_eval1_total|default:'0' }}">
-    <input type="hidden" id="parent_eval2_total" value="{{ parent_eval2_total|default:'0' }}">
-    <input type="hidden" id="parent_eval3_total" value="{{ parent_eval3_total|default:'0' }}">
-
-    {% if student %}
-    <div class="dashboard-cards">
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
-                <h3>{{ student.child_name }}'s Overall Performance</h3>
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="welcome-header">
+            <div class="welcome-text">
+                Welcome, <span>{{ student.father_name }}</span>
             </div>
-            <div class="card-body">
-                <table class="performance-table">
-                    <thead>
-                        <tr>
-                            <th>Domain</th>
-                            <th>1st Eval (Teacher)</th>
-                            <th>1st Eval (Parent)</th>
-                            <th>2nd Eval (Teacher)</th>
-                            <th>2nd Eval (Parent)</th>
-                            <th>3rd Eval (Teacher)</th>
-                            <th>3rd Eval (Parent)</th>
-                            <th class="total-column">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <i class="fas fa-running" style="color: rgb(255, 99, 132);"></i> Gross Motor
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.gross.eval1_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.gross.eval1_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.gross.eval2_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.gross.eval2_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.gross.eval3_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.gross.eval3_score|default:"0" }}</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-hand-paper" style="color: rgb(54, 162, 235);"></i> Fine Motor
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.fine.eval1_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="teacher-score">{{ teacher_evaluations.fine.eval2_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="teacher-score">{{ teacher_evaluations.fine.eval3_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-hands-helping" style="color: rgb(75, 192, 192);"></i> Self Help
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval1_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.self_help.eval1_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval2_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.self_help.eval2_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.self_help.eval3_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.self_help.eval3_score|default:"0" }}</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-ear-listen" style="color: rgb(153, 102, 255);"></i> Receptive Language
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval1_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval2_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="teacher-score">{{ teacher_evaluations.receptive.eval3_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-comments" style="color: rgb(255, 159, 64);"></i> Expressive Language
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval1_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.expressive.eval1_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval2_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.expressive.eval2_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.expressive.eval3_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.expressive.eval3_score|default:"0" }}</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-brain" style="color: rgb(255, 205, 86);"></i> Cognitive
-                            </td>
-                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval1_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.cognitive.eval1_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval2_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.cognitive.eval2_score|default:"0" }}</td>
-                            <td class="teacher-score">{{ teacher_evaluations.cognitive.eval3_score|default:"0" }}</td>
-                            <td class="parent-score">{{ parent_evaluations.cognitive.eval3_score|default:"0" }}</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <i class="fas fa-users" style="color: rgb(201, 203, 207);"></i> Social-Emotional
-                            </td>
-                            <td>N/A</td>
-                            <td class="parent-score">{{ parent_evaluations.social.eval1_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="parent-score">{{ parent_evaluations.social.eval2_score|default:"0" }}</td>
-                            <td>N/A</td>
-                            <td class="parent-score">{{ parent_evaluations.social.eval3_score|default:"0" }}</td>
-                            <td class="domain-total"></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="header-buttons">
+                <div class="date-display">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="currentDate">Loading date...</span>
+                </div>
             </div>
         </div>
-        
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="domain-icon"><i class="fas fa-chart-line"></i></div>
-                <h3>Progress Visualization</h3>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 20px; font-weight: 600;">Development Domains Progress</h4>
-                    <canvas id="performanceChart"></canvas>
-                    
-                    <!-- Static legend -->
-                    <div class="chart-legend" style="margin-top: 25px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(255, 99, 132);"></span>
-                            <span class="legend-text">Gross Motor</span>
+
+        <div class="dashboard-overview">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-child"></i>
+                    <h3>Child Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-summary">
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">{{ student.child_name }}</div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(54, 162, 235);"></span>
-                            <span class="legend-text">Fine Motor</span>
+                        <div class="info-item">
+                            <div class="info-label">Gender</div>
+                            <div class="info-value">{{ student.sex }}</div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(75, 192, 192);"></span>
-                            <span class="legend-text">Self Help</span>
+                        <div class="info-item">
+                            <div class="info-label">Date of Birth</div>
+                            <div class="info-value">{{ student.dob|date:"F d, Y" }}</div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(153, 102, 255);"></span>
-                            <span class="legend-text">Receptive</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(255, 159, 64);"></span>
-                            <span class="legend-text">Expressive</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: rgb(255, 205, 86);"></span>
-                            <span class="legend-text">Cognitive</span>
+                        <div class="view-more-btn">
+                            <a href="{% url 'student_profile' %}">View Complete Profile</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- New Overall Performance Summary Card -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <div class="domain-icon"><i class="fas fa-star"></i></div>
-                <h3>Overall Performance Summary</h3>
-            </div>
-            <div class="card-body">
-                <div class="overall-metrics">
-                    <!-- Progress Metrics -->
-                    <div class="progress-metrics">
-                        <div class="metric-box teacher-metric">
-                            <div class="metric-title">
-                                <i class="fas fa-chalkboard-teacher"></i> Teacher Assessment
+
+        <div class="dashboard-cards second-row">            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notifications</h3>
+                </div>
+                <div class="card-body">
+                    <div class="notification-list">
+                        <div class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-clipboard-check"></i>
                             </div>
-                            <div class="metric-values">
-                                <div class="metric-item">
-                                    <span class="label">1st Evaluation:</span>
-                                    <span class="value">{{ teacher_eval1_total }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="label">2nd Evaluation:</span>
-                                    <span class="value">{{ teacher_eval2_total }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="label">3rd Evaluation:</span>
-                                    <span class="value">{{ teacher_eval3_total }}</span>
-                                </div>
-                                <div class="metric-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress" id="teacherProgress"></div>
-                                    </div>
-                                    <div class="progress-text" id="teacherProgressText"></div>
-                                </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Evaluation Reminder</div>
+                                <div class="notification-text">Please complete the Gross Motor evaluation by October 15.</div>
+                                <div class="notification-time">2 days ago</div>
                             </div>
                         </div>
                         
-                        <div class="metric-box parent-metric">
-                            <div class="metric-title">
-                                <i class="fas fa-home"></i> Parent Assessment
+                        <div class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-chart-pie"></i>
                             </div>
-                            <div class="metric-values">
-                                <div class="metric-item">
-                                    <span class="label">1st Evaluation:</span>
-                                    <span class="value">{{ parent_eval1_total }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="label">2nd Evaluation:</span>
-                                    <span class="value">{{ parent_eval2_total }}</span>
-                                </div>
-                                <div class="metric-item">
-                                    <span class="label">3rd Evaluation:</span>
-                                    <span class="value">{{ parent_eval3_total }}</span>
-                                </div>
-                                <div class="metric-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress" id="parentProgress"></div>
-                                    </div>
-                                    <div class="progress-text" id="parentProgressText"></div>
-                                </div>
+                            <div class="notification-content">
+                                <div class="notification-title">Performance Report</div>
+                                <div class="notification-text">September performance report is now available.</div>
+                                <div class="notification-time">1 week ago</div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Combined Progress Gauge -->
-                    <div class="combined-progress">
-                        <h4>Combined Progress</h4>
-                        <div class="gauge-container">
-                            <canvas id="progressGauge"></canvas>
-                        </div>
-                        <div class="overall-score" id="overallScore">
-                            <span id="scoreValue"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div> 
-    {% else %}
-    <div class="alert">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div>No student record found. Please contact your administrator.</div>
-    </div>
-    {% endif %}
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    
-    // Calculate domain totals and grand total
-    calculateTotals();
-    
-    // Function to calculate totals
-    function calculateTotals() {
-        // Calculate domain totals
-        const rows = document.querySelectorAll('.performance-table tbody tr:not(.total-row)');
-        let grandTotal = 0;
-        
-        rows.forEach(row => {
-            let total = 0;
-            const scoreElements = row.querySelectorAll('.teacher-score, .parent-score');
-            
-            scoreElements.forEach(cell => {
-                // Get the score value, convert to number
-                const scoreValue = cell.textContent.trim();
-                if (scoreValue !== 'N/A' && !isNaN(scoreValue)) {
-                    total += parseInt(scoreValue, 10);
-                }
-            });
-            
-            // Update the total cell for this row
-            const totalCell = row.querySelector('.domain-total');
-            if (totalCell) {
-                totalCell.textContent = total;
-                grandTotal += total;
-            }
-        });
-        
-        // Update grand total
-        const grandTotalCell = document.querySelector('.grand-total');
-        if (grandTotalCell) {
-            grandTotalCell.textContent = grandTotal;
-        }
-    }
-    
-    const labels = ['1st Evaluation', '2nd Evaluation', '3rd Evaluation'];
-    const datasets = [];
-    
-    // Define domain colors
-    const domainColors = {
-        'Gross Motor': 'rgb(255, 99, 132)',
-        'Fine Motor': 'rgb(54, 162, 235)',
-        'Self Help': 'rgb(75, 192, 192)',
-        'Receptive Language': 'rgb(153, 102, 255)',
-        'Expressive Language': 'rgb(255, 159, 64)',
-        'Cognitive': 'rgb(255, 205, 86)',
-        'Social-Emotional': 'rgb(201, 203, 207)'
-    };
-    
-    {% for eval in gross_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Gross Motor',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Gross Motor'],
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Gross Motor'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in fine_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Fine Motor',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Fine Motor'],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Fine Motor'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in self_help_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Self Help',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Self Help'],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Self Help'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in receptive_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Receptive Language',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Receptive Language'],
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Receptive Language'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });         
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in expressive_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Expressive Language',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Expressive Language'],
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Expressive Language'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in cognitive_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Cognitive',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Cognitive'],
-                backgroundColor: 'rgba(255, 205, 86, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Cognitive'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-
-    {% for eval in social_evaluations %}
-        {% if eval.student_name == student.child_name %}
-            datasets.push({
-                label: 'Social-Emotional',
-                data: [{{ eval.eval1_score }}, {{ eval.eval2_score }}, {{ eval.eval3_score }}],
-                borderColor: domainColors['Social-Emotional'],
-                backgroundColor: 'rgba(201, 203, 207, 0.2)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointBackgroundColor: domainColors['Social-Emotional'],
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            });
-        {% endif %}
-    {% endfor %}
-    
-    // Create the chart
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false  // We're using our custom legend below
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFont: {
-                        family: "'Poppins', sans-serif",
-                        size: 14
-                    },
-                    bodyFont: {
-                        family: "'Poppins', sans-serif",
-                        size: 13
-                    },
-                    padding: 15,
-                    cornerRadius: 8,
-                    displayColors: true
-                }
-            },
-            animation: {
-                duration: 2000,
-                easing: 'easeOutQuart'
-            },
-            elements: {
-                line: {
-                    borderWidth: 3
-                }
-            }
-        }
-    });
-    
-    // Enhance the legend items with better visibility and interactivity
-    const legendItems = document.querySelectorAll('.legend-item');
-    
-    // First, make sure all legend items are visible with proper styling
-    legendItems.forEach(item => {
-        // Enhance visibility of legend items
-        const textElement = item.querySelector('.legend-text');
-        textElement.style.fontWeight = '600';
-        textElement.style.fontSize = '13px';
-        textElement.style.color = '#333';
-        
-        const colorElement = item.querySelector('.legend-color');
-        colorElement.style.width = '18px';
-        colorElement.style.height = '18px';
-        colorElement.style.border = '2px solid white';
-        colorElement.style.boxShadow = '0 0 2px rgba(0,0,0,0.2)';
-        
-        // Make the whole item more visible
-        item.style.padding = '8px 12px';
-        item.style.backgroundColor = 'rgba(255,255,255,0.8)';
-        item.style.borderRadius = '6px';
-        item.style.margin = '5px';
-        item.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    });
-    
-    // Then add interactivity
-    legendItems.forEach(item => {
-        const domainName = item.querySelector('.legend-text').textContent;
-        // Map shortened names back to full names for Receptive and Expressive
-        let fullDomainName = domainName;
-        if (domainName === 'Receptive') fullDomainName = 'Receptive Language';
-        if (domainName === 'Expressive') fullDomainName = 'Expressive Language';
-        
-        const datasetIndex = datasets.findIndex(d => d.label === fullDomainName);
-        
-        if (datasetIndex !== -1) {
-            // Add click event to toggle visibility
-            item.addEventListener('click', () => {
-                const isDatasetVisible = myChart.isDatasetVisible(datasetIndex);
-                
-                if (isDatasetVisible) {
-                    myChart.hide(datasetIndex);
-                    item.style.opacity = 0.5;
-                    item.style.backgroundColor = 'rgba(200,200,200,0.3)';
-                } else {
-                    myChart.show(datasetIndex);
-                    item.style.opacity = 1;
-                    item.style.backgroundColor = 'rgba(255,255,255,0.8)';
-                }
-            });
-            
-            // Add hover effect
-            item.addEventListener('mouseenter', () => {
-                item.style.backgroundColor = 'rgba(240,240,240,0.9)';
-                item.style.transform = 'translateY(-2px)';
-                item.style.boxShadow = '0 3px 5px rgba(0,0,0,0.15)';
-            });
-            
-            item.addEventListener('mouseleave', () => {
-                if (myChart.isDatasetVisible(datasetIndex)) {
-                    item.style.backgroundColor = 'rgba(255,255,255,0.8)';
-                } else {
-                    item.style.backgroundColor = 'rgba(200,200,200,0.3)';
-                }
-                item.style.transform = 'translateY(0)';
-                item.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-            });
-        }
-    });
-
-    // Mobile menu toggle functionality
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    // Function to toggle sidebar
-    function toggleSidebar() {
-        sidebar.classList.toggle('active');
-        sidebarOverlay.classList.toggle('active');
-    }
-    
-    // Add click event to mobile menu toggle
-    mobileMenuToggle.addEventListener('click', toggleSidebar);
-    
-    // Close sidebar when clicking on overlay
-    sidebarOverlay.addEventListener('click', toggleSidebar);
-    
-    // Fix for sidebar links to ensure they're clickable
-    const sidebarLinks = document.querySelectorAll('.sidebar-btn, .logout-btn');
-    sidebarLinks.forEach(link => {
-        link.style.pointerEvents = 'auto';
-        link.style.cursor = 'pointer';
-        link.style.position = 'relative';
-        link.style.zIndex = '1002';
-        
-        // For debugging
-        link.addEventListener('click', function() {
-            console.log("Link clicked:", this.textContent.trim());
-        });
-    });
-
-    // Function to log all evaluation scores
-    function logAllScores() {
-        // Teacher evaluations
-        console.log('Teacher Evaluations:');
-        console.log('Gross Motor:', document.getElementById('teacher_gross_scores').value);
-        console.log('Fine Motor:', document.getElementById('teacher_fine_scores').value);
-        console.log('Self Help:', document.getElementById('teacher_self_help_scores').value);
-        console.log('Receptive:', document.getElementById('teacher_receptive_scores').value);
-        console.log('Expressive:', document.getElementById('teacher_expressive_scores').value);
-        console.log('Cognitive:', document.getElementById('teacher_cognitive_scores').value);
-
-        // Parent evaluations
-        console.log('Parent Evaluations:');
-        console.log('Gross Motor:', document.getElementById('parent_gross_scores').value);
-        console.log('Self Help:', document.getElementById('parent_self_help_scores').value);
-        console.log('Social:', document.getElementById('parent_social_scores').value);
-        console.log('Expressive:', document.getElementById('parent_expressive_scores').value);
-        console.log('Cognitive:', document.getElementById('parent_cognitive_scores').value);
-    }
-
-    // Call the function when page loads
-    logAllScores();
-
-    // Add debug button functionality
-    const checkDataBtn = document.getElementById('checkDataBtn');
-    const dataDisplay = document.getElementById('dataDisplay');
-
-    checkDataBtn.addEventListener('click', function() {
-        const parentData = {
-            'Gross Motor': document.getElementById('parent_gross_scores').value,
-            'Self Help': document.getElementById('parent_self_help_scores').value,
-            'Social': document.getElementById('parent_social_scores').value,
-            'Expressive': document.getElementById('parent_expressive_scores').value,
-            'Cognitive': document.getElementById('parent_cognitive_scores').value
-        };
-
-        dataDisplay.style.display = 'block';
-        dataDisplay.innerHTML = '<h4>Parent Evaluation Data:</h4>' + 
-            '<pre>' + JSON.stringify(parentData, null, 2) + '</pre>';
-    });
-
-    // Overall Performance Summary Card functionality
-    function updateProgressBars() {
-        // Teacher progress
-        const teacherEval1 = parseInt(document.getElementById('teacher_eval1_total').value || 0);
-        const teacherEval3 = parseInt(document.getElementById('teacher_eval3_total').value || 0);
-        const teacherProgress = document.getElementById('teacherProgress');
-        const teacherProgressText = document.getElementById('teacherProgressText');
-        
-        // Parent progress
-        const parentEval1 = parseInt(document.getElementById('parent_eval1_total').value || 0);
-        const parentEval3 = parseInt(document.getElementById('parent_eval3_total').value || 0);
-        const parentProgress = document.getElementById('parentProgress');
-        const parentProgressText = document.getElementById('parentProgressText');
-        
-        console.log('Teacher values:', teacherEval1, teacherEval3);
-        console.log('Parent values:', parentEval1, parentEval3);
-        
-        // Calculate progress percentages
-        let teacherProgressPct = 0;
-        let parentProgressPct = 0;
-        
-        if (teacherEval1 > 0) {
-            teacherProgressPct = ((teacherEval3 - teacherEval1) / teacherEval1) * 100;
-            teacherProgressPct = Math.max(0, teacherProgressPct); // Don't show negative progress
-        }
-        
-        if (parentEval1 > 0) {
-            parentProgressPct = ((parentEval3 - parentEval1) / parentEval1) * 100;
-            parentProgressPct = Math.max(0, parentProgressPct); // Don't show negative progress
-        }
-        
-        console.log('Teacher progress %:', teacherProgressPct);
-        console.log('Parent progress %:', parentProgressPct);
-        
-        // Cap progress percentage to 100% for visual purposes
-        const teacherProgressWidth = Math.min(100, teacherProgressPct);
-        const parentProgressWidth = Math.min(100, parentProgressPct);
-        
-        // Animate progress bars
-        setTimeout(() => {
-            teacherProgress.style.width = teacherProgressWidth + '%';
-            parentProgress.style.width = parentProgressWidth + '%';
-            
-            // Update text
-            teacherProgressText.textContent = teacherProgressPct.toFixed(1) + '% improvement';
-            parentProgressText.textContent = parentProgressPct.toFixed(1) + '% improvement';
-        }, 300);
-        
-        // Create combined progress gauge
-        createProgressGauge(teacherProgressPct, parentProgressPct);
-    }
-    
-    function createProgressGauge(teacherPct, parentPct) {
-        // Calculate overall progress
-        const overallProgress = (teacherPct + parentPct) / 2;
-        
-        // Get the canvas element
-        const gaugeCtx = document.getElementById('progressGauge').getContext('2d');
-        
-        // Create a gauge chart using Chart.js
-        const gaugeChart = new Chart(gaugeCtx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [overallProgress, 100 - overallProgress],
-                    backgroundColor: [
-                        overallProgress >= 75 ? '#4caf50' : // Green for high progress
-                            overallProgress >= 50 ? '#ff9800' : // Orange for medium progress
-                            '#f44336', // Red for low progress
-                        '#e9ecef'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '75%',
-                circumference: 180,
-                rotation: 270,
-                plugins: {
-                    tooltip: {
-                        enabled: false
-                    },
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-        
-        // Update the progress text
-        const scoreValue = document.getElementById('scoreValue');
-        scoreValue.textContent = overallProgress.toFixed(1) + '%';
-        scoreValue.style.color = overallProgress >= 75 ? '#4caf50' : 
-                               overallProgress >= 50 ? '#ff9800' : 
-                               '#f44336';
-    }
-    
-    // Initialize progress bars and gauge when page loads
-    if (document.getElementById('teacherProgress')) {
-        updateProgressBars();
-    }
-
-    // Toggle debug section
-    const toggleDebugBtn = document.getElementById('toggleDebug');
-    const debugSection = document.querySelector('.debug-section');
-    
-    if (toggleDebugBtn && debugSection) {
-        toggleDebugBtn.addEventListener('click', function() {
-            if (debugSection.style.display === 'none') {
-                debugSection.style.display = 'block';
-                toggleDebugBtn.textContent = 'Hide Debug Info';
-            } else {
-                debugSection.style.display = 'none';
-                toggleDebugBtn.textContent = 'Show Debug Info';
-            }
-        });
-    }
-    
-    // Check hidden fields
-    const checkHiddenFieldsBtn = document.getElementById('checkHiddenFields');
-    const hiddenFieldsOutput = document.getElementById('hiddenFieldsOutput');
-    
-    if (checkHiddenFieldsBtn && hiddenFieldsOutput) {
-        checkHiddenFieldsBtn.addEventListener('click', function() {
-            const hiddenFields = {
-                'Teacher Eval 1': document.getElementById('teacher_eval1_total')?.value || 'Not found',
-                'Teacher Eval 2': document.getElementById('teacher_eval2_total')?.value || 'Not found',
-                'Teacher Eval 3': document.getElementById('teacher_eval3_total')?.value || 'Not found',
-                'Parent Eval 1': document.getElementById('parent_eval1_total')?.value || 'Not found',
-                'Parent Eval 2': document.getElementById('parent_eval2_total')?.value || 'Not found',
-                'Parent Eval 3': document.getElementById('parent_eval3_total')?.value || 'Not found'
-            };
-            
-            // Display the data
-            hiddenFieldsOutput.style.display = 'block';
-            hiddenFieldsOutput.innerHTML = '';
-            
-            for (const [key, value] of Object.entries(hiddenFields)) {
-                const row = document.createElement('div');
-                row.style.margin = '5px 0';
-                row.innerHTML = `<strong>${key}:</strong> ${value || 'No data'}`;
-                hiddenFieldsOutput.appendChild(row);
-            }
-        });
-    }
-    
-    // Initially hide the debug section
-    if (debugSection) {
-        debugSection.style.display = 'none';
-    }
-});
-</script>
-
-<!-- Add a debug section for troubleshooting -->
-<div class="debug-section" style="margin: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; display: none;">
-    <h3>Debug Information</h3>
-    <button id="toggleDebug" class="btn btn-sm btn-secondary">Show Debug Info</button>
-    
-    <div style="margin-top: 20px;">
-        <button id="checkHiddenFields" class="btn btn-sm btn-info">Check Hidden Fields</button>
-        <div id="hiddenFieldsOutput" style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 5px; display: none;"></div>
-    </div>
-    
-    <div style="margin-top: 20px;">
-        <button id="checkDataBtn" class="btn btn-sm btn-info">Check Parent Data</button>
-        <div id="dataDisplay" style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 5px; display: none;"></div>
     </div>
 </div>
 
-<!-- Add this CSS to your head section -->
 <style>
-    /* Dashboard container styles */
-    .dashboard-container {
-        padding: 20px;
-        position: relative;
-        max-width: 100%;
-    }
-
-    /* Welcome header styles */
-    .welcome-header {
-        padding: 15px 20px;
-        margin-bottom: 30px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-left: 250px; /* Match sidebar width */
-        margin-right: 20px; /* Add right margin for better spacing */
-    }
-
-    /* Dashboard cards container */
-    .dashboard-cards {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        margin-left: 250px; /* Add margin to account for sidebar width */
-        margin-right: 20px; /* Add right margin for better spacing */
-        padding: 0;
-    }
-    
-    .dashboard-card {
-        width: 100%;
-        min-width: 100%;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        overflow: hidden;
-        margin-bottom: 20px;
-    }
-
-    /* Card header styles */
-    .card-header {
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eee;
-    }
-
-    .card-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        color: #2d6a4f;
-    }
-
-    /* Card body styles */
-    .card-body {
-        padding: 25px;
-    }
-
-    /* Chart container styles */
-    .chart-container {
-        width: 100%;
-        height: 500px;
-        margin: 0 auto;
-    }
-
-    /* Performance table styles */
-    .performance-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    .performance-table th,
-    .performance-table td {
-        padding: 12px;
-        text-align: center;
-        border: 1px solid #eee;
-    }
-
-    .performance-table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-    }
-
-    /* Total column styling */
-    .performance-table .total-column {
-        background-color: #2d6a4f;
-        color: white;
-    }
-    
-    .performance-table .domain-total {
-        background-color: #f0f7f4;
-        font-weight: bold;
-        border-left: 2px solid #2d6a4f;
-    }
-
-    /* Total row styling */
-    .performance-table .total-row {
-        background-color: #f0f7f4;
-        font-weight: bold;
-    }
-    
-    .performance-table .total-row td {
-        border-top: 2px solid #2d6a4f;
-        border-bottom: 2px solid #2d6a4f;
-    }
-    
-    .performance-table .grand-total {
-        background-color: #2d6a4f;
-        color: white;
-        font-weight: bold;
-        font-size: 1.1em;
-    }
-
     /* Sidebar Styles */
     .sidebar {
         position: fixed;
@@ -1040,142 +216,16 @@ document.addEventListener('DOMContentLoaded', function() {
         display: none;
     }
     
-    /* Overall Performance Summary Card Styles */
-    .overall-metrics {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
+    #sidebarOverlay.active {
+        display: block;
     }
     
-    .progress-metrics {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        flex: 1;
-        min-width: 300px;
-    }
-    
-    .metric-box {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    .teacher-metric {
-        border-left: 4px solid #2d6a4f;
-    }
-    
-    .parent-metric {
-        border-left: 4px solid #1a759f;
-    }
-    
-    .metric-title {
+    /* Sidebar active state */
+    .sidebar-btn.active {
+        background-color: rgba(255,255,255,0.2);
+        border-left: 4px solid #fff;
         font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 15px;
-        color: #333;
-        display: flex;
-        align-items: center;
-    }
-    
-    .metric-title i {
-        margin-right: 10px;
-        color: #2d6a4f;
-    }
-    
-    .parent-metric .metric-title i {
-        color: #1a759f;
-    }
-    
-    .metric-values {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .metric-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px dashed #eee;
-    }
-    
-    .metric-item .label {
-        color: #666;
-    }
-    
-    .metric-item .value {
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .metric-progress {
-        margin-top: 15px;
-    }
-    
-    .progress-bar {
-        height: 10px;
-        background-color: #e9ecef;
-        border-radius: 5px;
-        overflow: hidden;
-        margin-bottom: 5px;
-    }
-    
-    .progress {
-        height: 100%;
-        background-color: #2d6a4f;
-        border-radius: 5px;
-        width: 0;
-        transition: width 1.5s ease-in-out;
-    }
-    
-    .parent-metric .progress {
-        background-color: #1a759f;
-    }
-    
-    .progress-text {
-        text-align: right;
-        font-size: 0.85rem;
-        color: #666;
-    }
-    
-    .combined-progress {
-        flex: 1;
-        min-width: 300px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    .combined-progress h4 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        color: #2d6a4f;
-        font-weight: 600;
-    }
-    
-    .gauge-container {
-        width: 200px;
-        height: 200px;
-        margin: 0 auto;
-    }
-    
-    .overall-score {
-        margin-top: 20px;
-        text-align: center;
-    }
-    
-    #scoreValue {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2d6a4f;
+        padding-left: 16px;
     }
     
     /* Responsive Styles */
@@ -1192,25 +242,332 @@ document.addEventListener('DOMContentLoaded', function() {
             display: flex;
         }
         
-        #sidebarOverlay.active {
-            display: block;
-        }
-        
-        .welcome-header {
+        .main-content {
             margin-left: 0;
-            margin-right: 0;
-            padding-left: 70px; /* Leave space for mobile menu button */
         }
-        
-        .dashboard-cards {
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+    }
+    
+    @media (max-width: 768px) {
+        .main-content {
             margin-left: 0;
-            margin-right: 0;
-            padding: 0 10px;
+        }
+    }
+    
+    /* Welcome Header with Date */
+    .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .date-display {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 8px 15px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Dashboard Overview (first row) */
+    .dashboard-overview {
+        display: flex;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+    
+    @media (max-width: 992px) {
+        .dashboard-overview {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Child Information Card */
+    .info-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .info-item {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--primary);
+    }
+    
+    .view-more-btn {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .view-more-btn a {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .view-more-btn a:hover {
+        background-color: var(--primary-light);
+        transform: translateY(-2px);
+    }
+    
+    /* Performance Summary */
+    .performance-summary {
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .performance-chart {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .no-data-message {
+        text-align: center;
+        padding: 30px 20px;
+        color: #6c757d;
+    }
+    
+    .no-data-message i {
+        font-size: 2.5rem;
+        color: #adb5bd;
+        margin-bottom: 15px;
+    }
+    
+    .no-data-message p {
+        margin-bottom: 20px;
+    }
+    
+    .action-button {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .action-button:hover {
+        background-color: var(--primary-light);
+        transform: translateY(-2px);
+    }
+    
+    /* Second row cards */
+    .second-row {
+        margin-top: 0;
+        display:flex;
+    }
+    
+    /* Evaluation Calendar */
+    .evaluation-calendar {
+        width: 100%;
+    }
+    
+    .calendar-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .calendar-row.header {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+    
+    .calendar-cell {
+        padding: 12px 15px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .calendar-cell:first-child {
+        text-align: left;
+        justify-content: flex-start;
+    }
+    
+    .status {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .upcoming {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .completed {
+        background-color: #cff4fc;
+        color: #055160;
+    }
+    
+    .btn-evaluate {
+        padding: 5px 15px;
+        background-color: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-evaluate:hover {
+        background-color: var(--primary-light);
+    }
+    
+    .btn-evaluate.disabled {
+        background-color: #adb5bd;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    
+    /* Notifications */
+    .notification-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .notification-item {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #e9f5f2;
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+    
+    .notification-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    .notification-time {
+        font-size: 0.8rem;
+        color: #adb5bd;
+    }
+    
+    /* Additional Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .calendar-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 15px;
         }
         
-        .overall-metrics {
-            flex-direction: column;
+        .calendar-row.header {
+            display: none;
+        }
+        
+        .calendar-cell {
+            padding: 5px;
+            text-align: left;
+            justify-content: flex-start;
+            position: relative;
+        }
+        
+        .calendar-cell:before {
+            content: attr(data-label);
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .info-summary {
+            grid-template-columns: 1fr;
         }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+        
+        // Add click event to mobile menu toggle
+        mobileMenuToggle.addEventListener('click', toggleSidebar);
+        
+        // Close sidebar when clicking on overlay
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        
+        // Display current date
+        const currentDateElement = document.getElementById('currentDate');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        currentDateElement.textContent = today.toLocaleDateString('en-US', options);
+    });
+</script>
 {% endblock %}

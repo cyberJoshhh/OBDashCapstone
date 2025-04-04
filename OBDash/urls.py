@@ -24,6 +24,7 @@ from .views import (
     ParentEvaluationSocial,
     ParentEvaluationExpressive,
     ParentEvaluationCognitive,
+    student_profile,
 )
 
 urlpatterns = [
@@ -57,4 +58,5 @@ urlpatterns = [
     path('parent-evaluation-cognitive/<int:student_id>/', ParentEvaluationCognitive, name='parent_evaluation_cognitive_with_id'),
     path('comparison/', views.comparison_view, name='comparison_view'),
     path('student-performance/', views.student_performance, name='student_performance'),
+    path('student-profile/', student_profile, name='student_profile'),
 ]

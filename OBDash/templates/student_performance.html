@@ -8,17 +8,57 @@
 <link rel="stylesheet" href="{% static 'css/pdash.css' %}">
 
 <div class="dashboard-container">
-    <!-- Top Navigation with Back Button and Student Name -->
-    <div class="top-navigation">
-        <a href="{% url 'student_performance' %}" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Search
-        </a>
-        {% if student_name %}
-        <div class="student-name-display">
-            <i class="fas fa-user-graduate"></i>
-            <h2>{{ student_name }}</h2>
+    <!-- Add this button for mobile menu toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Add this for the sidebar overlay -->
+    <div id="sidebarOverlay"></div>
+
+    <!-- Create the sidebar structure -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>OB Pagsasarili</h3>
         </div>
-        {% endif %}
+        <div class="sidebar-content">
+            <a href="{% url 'dashboard' %}" class="sidebar-btn">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'student_profile' %}" class="sidebar-btn">
+                <i class="fas fa-user"></i>
+                <span>Student Profile</span>
+            </a>
+            <a href="{% url 'student_performance' %}" class="sidebar-btn active">
+                <i class="fas fa-chart-line"></i>
+                <span>Performance Report</span>
+            </a>
+            <a href="#" class="sidebar-btn">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+                <span class="notification-badge"></span>
+            </a>
+            <a href="{% url 'evaluation_gross' %}" class="sidebar-btn">
+                <i class="fas fa-chart-bar"></i>
+                <span>Evaluation</span>
+            </a>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Welcome header -->
+    <div class="welcome-header">
+        <div class="welcome-text">
+            {% if student_name %}
+            <span>{{ student_name }}</span>'s Performance Report
+            {% else %}
+            Performance Report
+            {% endif %}
+        </div>
     </div>
 
     {% if has_data %}
@@ -493,64 +533,400 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     {% endif %}
+    
+    // Mobile menu toggle functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Function to toggle sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+    }
+    
+    // Add click event to mobile menu toggle
+    mobileMenuToggle.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar when clicking on overlay
+    sidebarOverlay.addEventListener('click', toggleSidebar);
 });
 </script>
 
 <!-- Additional Styles -->
 <style>
-    .top-navigation {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* Welcome header styles */
+    .welcome-header {
         padding: 15px 20px;
+        margin-bottom: 30px;
         background-color: white;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-left: 250px; /* Match sidebar width */
+        margin-right: 20px; /* Add right margin for better spacing */
+    }
+    
+    .welcome-text {
+        font-size: 1.5rem;
+        color: #333;
+    }
+    
+    .welcome-text span {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    /* Dashboard container styles */
+    .dashboard-container {
+        padding: 20px;
+        position: relative;
+        max-width: 100%;
+    }
+
+    /* Dashboard cards container */
+    .dashboard-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        margin-left: 250px; /* Add margin to account for sidebar width */
+        margin-right: 20px; /* Add right margin for better spacing */
+        padding: 0;
+    }
+    
+    .dashboard-card {
+        width: 100%;
+        min-width: 100%;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        overflow: hidden;
         margin-bottom: 20px;
     }
-    
-    .back-button {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 16px;
+
+    /* Card header styles */
+    .card-header {
+        padding: 20px;
         background-color: #f8f9fa;
-        color: #333;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    
-    .back-button:hover {
-        background-color: #e9ecef;
-        color: #2d6a4f;
-    }
-    
-    .back-button i {
-        margin-right: 8px;
-    }
-    
-    .student-name-display {
+        border-bottom: 1px solid #eee;
         display: flex;
         align-items: center;
     }
     
-    .student-name-display i {
+    .domain-icon {
         font-size: 1.5rem;
         color: #2d6a4f;
-        margin-right: 10px;
+        margin-right: 15px;
     }
-    
-    .student-name-display h2 {
+
+    .card-header h3 {
         margin: 0;
         font-size: 1.5rem;
+        color: #2d6a4f;
+    }
+
+    /* Card body styles */
+    .card-body {
+        padding: 25px;
+    }
+
+    /* Chart container styles */
+    .chart-container {
+        width: 100%;
+        height: 500px;
+        margin: 0 auto;
+    }
+
+    /* Performance table styles */
+    .performance-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .performance-table th,
+    .performance-table td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #eee;
+    }
+
+    .performance-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    /* Total column styling */
+    .performance-table .total-column {
+        background-color: #2d6a4f;
+        color: white;
+    }
+    
+    .performance-table .domain-total {
+        background-color: #f0f7f4;
+        font-weight: bold;
+        border-left: 2px solid #2d6a4f;
+    }
+
+    /* Total row styling */
+    .performance-table .total-row {
+        background-color: #f0f7f4;
+        font-weight: bold;
+    }
+    
+    .performance-table .total-row td {
+        border-top: 2px solid #2d6a4f;
+        border-bottom: 2px solid #2d6a4f;
+    }
+    
+    .performance-table .grand-total {
+        background-color: #2d6a4f;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        background-color: #2d6a4f;
+        color: white;
+        z-index: 1001;
+        transition: transform 0.3s ease;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        overflow-y: auto;
+    }
+    
+    .sidebar-header {
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .sidebar-content {
+        padding: 20px 0;
+    }
+    
+    .sidebar-btn, .logout-btn {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+        cursor: pointer;
+    }
+    
+    .sidebar-btn:hover, .logout-btn:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-btn i, .logout-btn i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .logout-btn {
+        margin-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Active state for sidebar buttons */
+    .sidebar-btn.active {
+        background-color: rgba(255,255,255,0.2);
+        border-left: 4px solid #fff;
+        font-weight: 600;
+        padding-left: 16px;
+    }
+    
+    /* Mobile Toggle Button */
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+        background-color: #2d6a4f;
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    /* Overlay for mobile */
+    #sidebarOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: none;
+    }
+    
+    #sidebarOverlay.active {
+        display: block;
+    }
+    
+    /* Overall metrics styles */
+    .overall-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+    
+    .progress-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .metric-box {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .teacher-metric {
+        border-left: 4px solid #2d6a4f;
+    }
+    
+    .parent-metric {
+        border-left: 4px solid #1a759f;
+    }
+    
+    .metric-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
         color: #333;
+        display: flex;
+        align-items: center;
+    }
+    
+    .metric-title i {
+        margin-right: 10px;
+        color: #2d6a4f;
+    }
+    
+    .parent-metric .metric-title i {
+        color: #1a759f;
+    }
+    
+    .metric-values {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .metric-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    
+    .metric-item .label {
+        color: #666;
+    }
+    
+    .metric-item .value {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .metric-progress {
+        margin-top: 15px;
+    }
+    
+    .progress-bar {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .progress {
+        height: 100%;
+        background-color: #2d6a4f;
+        border-radius: 5px;
+        width: 0;
+        transition: width 1.5s ease-in-out;
+    }
+    
+    .parent-metric .progress {
+        background-color: #1a759f;
+    }
+    
+    .progress-text {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .combined-progress {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .combined-progress h4 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #2d6a4f;
+        font-weight: 600;
+    }
+    
+    .gauge-container {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+    }
+    
+    .overall-score {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    #scoreValue {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d6a4f;
     }
     
     .alert-container {
         padding: 30px;
         display: flex;
         justify-content: center;
+        margin-left: 250px; /* Match sidebar width */
     }
     
     .alert {
@@ -565,12 +941,37 @@ document.addEventListener('DOMContentLoaded', function() {
         margin-bottom: 15px;
         display: block;
     }
-
-    /* Override some styles for a cleaner look */
-    .dashboard-container {
-        padding: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
+    
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .mobile-menu-toggle {
+            display: flex;
+        }
+        
+        .welcome-header, .dashboard-cards, .alert-container {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .welcome-header {
+            padding-left: 70px; /* Leave space for mobile menu button */
+        }
+        
+        .dashboard-cards {
+            padding: 0 10px;
+        }
+        
+        .overall-metrics {
+            flex-direction: column;
+        }
     }
 </style>
 {% endblock %} 

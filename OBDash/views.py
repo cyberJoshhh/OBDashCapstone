@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 import json
 from django.db.models import Q
 from django.utils import timezone
+from datetime import date
 
 
 
@@ -131,7 +132,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)    
-                return redirect('dashboard')
+                return redirect('student_profile')  # Redirect parents to profile page
         else:
             # Check if this is a parent's name
             student_father = Student.objects.filter(father_name__iexact=parent_name).first()
@@ -142,13 +143,13 @@ def login_view(request):
                 username = parent_name.replace(' ', '_').lower()
                 user = User.objects.create_user(username=username, password=password)
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('student_profile')  # Redirect parents to profile page
             elif student_mother and student_mother.mother_password == password:
                 # Create user if it doesn't exist
                 username = parent_name.replace(' ', '_').lower()
                 user = User.objects.create_user(username=username, password=password)
                 login(request, user)
-                return redirect('dashboard')
+                return redirect('student_profile')  # Redirect parents to profile page
             else:
                 messages.error(request, 'Invalid parent name or password')
                 return render(request, 'Login.html', {'error': 'Invalid parent name or password'})
@@ -972,337 +973,6 @@ def comparison_view(request):
     
     return render(request, 'comparison.html', context)
 
-
-def overall(request):
-    # Convert the username to proper format for searching the student
-    username = request.user.username.replace('_', ' ')
-    
-    # Find student by parent's name
-    try:
-        print("\n\n=============== DEBUG INFO ===============")
-        print(f"Username: '{username}'")
-        
-        # Get all students for debugging
-        all_students = Student.objects.all()
-        print(f"All students in database: {[s.child_name for s in all_students]}")
-        
-        # Check all evaluation tables to see what's available
-        all_gross = GrossEvaluation.objects.all()
-        all_fine = FineEvaluation.objects.all()
-        all_self = SelfHelpEvaluation.objects.all()
-        all_cognitive = CognitiveEvaluation.objects.all()
-        
-        print(f"All gross evals: {[g.student_name for g in all_gross]}")
-        print(f"All fine evals: {[f.student_name for f in all_fine]}")
-        print(f"All self help evals: {[s.student_name for s in all_self]}")
-        print(f"All cognitive evals: {[c.student_name for c in all_cognitive]}")
-        
-        # Try to find student where either father's or mother's name matches the logged-in user
-        student = Student.objects.filter(
-            Q(father_name__iexact=username) | 
-            Q(mother_name__iexact=username)
-        ).first()
-        
-        print(f"Found student for parent: {student}")
-        
-        if not student:
-            # No student found for this parent
-            print("No student found for this parent!")
-            return render(request, 'PDash.html', {
-                'has_data': False,
-                'error_message': "No child information found for this account. Please contact your administrator."
-            })
-        
-        # Get the student's name to use for retrieving evaluation data
-        student_name = student.child_name
-        print(f"Found student: '{student_name}'")
-        
-        # Try different approaches to find evaluations
-        print("\nTrying exact match:")
-        exact_gross = GrossEvaluation.objects.filter(student_name=student_name).first()
-        print(f"Exact match gross: {exact_gross}")
-        
-        print("\nTrying case-insensitive match:")
-        iexact_gross = GrossEvaluation.objects.filter(student_name__iexact=student_name).first()
-        print(f"Case-insensitive match gross: {iexact_gross}")
-        
-        print("\nTrying contains match:")
-        contains_gross = GrossEvaluation.objects.filter(student_name__icontains=student_name.split()[0]).first()
-        print(f"Contains match gross: {contains_gross}")
-        
-        # USE EITHER EXACT, CASE-INSENSITIVE, OR CONTAINS MATCH BASED ON WHAT WORKED
-        # If contains match worked, use that approach for all evaluations
-        matching_approach = "iexact"  # Default to case-insensitive
-        
-        if not iexact_gross and contains_gross:
-            matching_approach = "contains"
-            search_term = student_name.split()[0]  # Use first name for contains search
-            print(f"Using CONTAINS matching with term: '{search_term}'")
-        else:
-            search_term = student_name
-            print(f"Using {matching_approach.upper()} matching with term: '{search_term}'")
-            
-        # Fetch teacher evaluations using the approach that worked
-        if matching_approach == "contains":
-            teacher_gross = GrossEvaluation.objects.filter(student_name__icontains=search_term).first()
-            teacher_fine = FineEvaluation.objects.filter(student_name__icontains=search_term).first()
-            teacher_self_help = SelfHelpEvaluation.objects.filter(student_name__icontains=search_term).first()
-            teacher_receptive = ReceptiveEvaluation.objects.filter(student_name__icontains=search_term).first()
-            teacher_expressive = ExpressiveEvaluation.objects.filter(student_name__icontains=search_term).first()
-            teacher_cognitive = CognitiveEvaluation.objects.filter(student_name__icontains=search_term).first()
-            
-            # Fetch parent evaluations
-            parent_gross = ParentGrossEvaluation.objects.filter(student_name__icontains=search_term).first()
-            parent_self_help = ParentSelfHelpEvaluation.objects.filter(student_name__icontains=search_term).first()
-            parent_social = ParentSocialEvaluation.objects.filter(student_name__icontains=search_term).first()
-            parent_expressive = ParentExpressiveEvaluation.objects.filter(student_name__icontains=search_term).first()
-            parent_cognitive = ParentCognitiveEvaluation.objects.filter(student_name__icontains=search_term).first()
-        else:
-            # Use case-insensitive match
-            teacher_gross = GrossEvaluation.objects.filter(student_name__iexact=search_term).first()
-            teacher_fine = FineEvaluation.objects.filter(student_name__iexact=search_term).first()
-            teacher_self_help = SelfHelpEvaluation.objects.filter(student_name__iexact=search_term).first()
-            teacher_receptive = ReceptiveEvaluation.objects.filter(student_name__iexact=search_term).first()
-            teacher_expressive = ExpressiveEvaluation.objects.filter(student_name__iexact=search_term).first()
-            teacher_cognitive = CognitiveEvaluation.objects.filter(student_name__iexact=search_term).first()
-            
-            # Fetch parent evaluations
-            parent_gross = ParentGrossEvaluation.objects.filter(student_name__iexact=search_term).first()
-            parent_self_help = ParentSelfHelpEvaluation.objects.filter(student_name__iexact=search_term).first()
-            parent_social = ParentSocialEvaluation.objects.filter(student_name__iexact=search_term).first()
-            parent_expressive = ParentExpressiveEvaluation.objects.filter(student_name__iexact=search_term).first()
-            parent_cognitive = ParentCognitiveEvaluation.objects.filter(student_name__iexact=search_term).first()
-        
-        # Print debug info
-        print(f"\nTeacher evaluations found:")
-        print(f"Gross: {teacher_gross}")
-        print(f"Fine: {teacher_fine}")
-        print(f"Self Help: {teacher_self_help}")
-        print(f"Receptive: {teacher_receptive}")
-        print(f"Expressive: {teacher_expressive}")
-        print(f"Cognitive: {teacher_cognitive}")
-        
-        print(f"\nParent evaluations found:")
-        print(f"Gross: {parent_gross}")
-        print(f"Self Help: {parent_self_help}")
-        print(f"Social: {parent_social}")
-        print(f"Expressive: {parent_expressive}")
-        print(f"Cognitive: {parent_cognitive}")
-        
-        # Create data for JSON
-        teacher_data = {
-            'gross_motor': [
-                teacher_gross.eval1_score if teacher_gross else 0,
-                teacher_gross.eval2_score if teacher_gross else 0,
-                teacher_gross.eval3_score if teacher_gross else 0
-            ],
-            'fine_motor': [
-                teacher_fine.eval1_score if teacher_fine else 0,
-                teacher_fine.eval2_score if teacher_fine else 0,
-                teacher_fine.eval3_score if teacher_fine else 0
-            ],
-            'self_help': [
-                teacher_self_help.eval1_score if teacher_self_help else 0,
-                teacher_self_help.eval2_score if teacher_self_help else 0,
-                teacher_self_help.eval3_score if teacher_self_help else 0
-            ],
-            'receptive': [
-                teacher_receptive.eval1_score if teacher_receptive else 0,
-                teacher_receptive.eval2_score if teacher_receptive else 0,
-                teacher_receptive.eval3_score if teacher_receptive else 0
-            ],
-            'expressive': [
-                teacher_expressive.eval1_score if teacher_expressive else 0,
-                teacher_expressive.eval2_score if teacher_expressive else 0,
-                teacher_expressive.eval3_score if teacher_expressive else 0
-            ],
-            'cognitive': [
-                teacher_cognitive.eval1_score if teacher_cognitive else 0,
-                teacher_cognitive.eval2_score if teacher_cognitive else 0,
-                teacher_cognitive.eval3_score if teacher_cognitive else 0
-            ]
-        }
-        
-        parent_data = {
-            'gross_motor': [
-                parent_gross.eval1_score if parent_gross else 0,
-                parent_gross.eval2_score if parent_gross else 0,
-                parent_gross.eval3_score if parent_gross else 0
-            ],
-            'self_help': [
-                parent_self_help.eval1_score if parent_self_help else 0,
-                parent_self_help.eval2_score if parent_self_help else 0,
-                parent_self_help.eval3_score if parent_self_help else 0
-            ],
-            'social': [
-                parent_social.eval1_score if parent_social else 0,
-                parent_social.eval2_score if parent_social else 0,
-                parent_social.eval3_score if parent_social else 0
-            ],
-            'expressive': [
-                parent_expressive.eval1_score if parent_expressive else 0,
-                parent_expressive.eval2_score if parent_expressive else 0,
-                parent_expressive.eval3_score if parent_expressive else 0
-            ],
-            'cognitive': [
-                parent_cognitive.eval1_score if parent_cognitive else 0,
-                parent_cognitive.eval2_score if parent_cognitive else 0,
-                parent_cognitive.eval3_score if parent_cognitive else 0
-            ]
-        }
-        
-        # Calculate total scores for each evaluation period
-        teacher_eval1_total = (
-            (teacher_gross.eval1_score if teacher_gross else 0) +
-            (teacher_fine.eval1_score if teacher_fine else 0) +
-            (teacher_self_help.eval1_score if teacher_self_help else 0) +
-            (teacher_receptive.eval1_score if teacher_receptive else 0) +
-            (teacher_expressive.eval1_score if teacher_expressive else 0) +
-            (teacher_cognitive.eval1_score if teacher_cognitive else 0)
-        )
-        
-        teacher_eval2_total = (
-            (teacher_gross.eval2_score if teacher_gross else 0) +
-            (teacher_fine.eval2_score if teacher_fine else 0) +
-            (teacher_self_help.eval2_score if teacher_self_help else 0) +
-            (teacher_receptive.eval2_score if teacher_receptive else 0) +
-            (teacher_expressive.eval2_score if teacher_expressive else 0) +
-            (teacher_cognitive.eval2_score if teacher_cognitive else 0)
-        )
-        
-        teacher_eval3_total = (
-            (teacher_gross.eval3_score if teacher_gross else 0) +
-            (teacher_fine.eval3_score if teacher_fine else 0) +
-            (teacher_self_help.eval3_score if teacher_self_help else 0) +
-            (teacher_receptive.eval3_score if teacher_receptive else 0) +
-            (teacher_expressive.eval3_score if teacher_expressive else 0) +
-            (teacher_cognitive.eval3_score if teacher_cognitive else 0)
-        )
-        
-        parent_eval1_total = (
-            (parent_gross.eval1_score if parent_gross else 0) +
-            (parent_self_help.eval1_score if parent_self_help else 0) +
-            (parent_social.eval1_score if parent_social else 0) +
-            (parent_expressive.eval1_score if parent_expressive else 0) +
-            (parent_cognitive.eval1_score if parent_cognitive else 0)
-        )
-        
-        parent_eval2_total = (
-            (parent_gross.eval2_score if parent_gross else 0) +
-            (parent_self_help.eval2_score if parent_self_help else 0) +
-            (parent_social.eval2_score if parent_social else 0) +
-            (parent_expressive.eval2_score if parent_expressive else 0) +
-            (parent_cognitive.eval2_score if parent_cognitive else 0)
-        )
-        
-        parent_eval3_total = (
-            (parent_gross.eval3_score if parent_gross else 0) +
-            (parent_self_help.eval3_score if parent_self_help else 0) +
-            (parent_social.eval3_score if parent_social else 0) +
-            (parent_expressive.eval3_score if parent_expressive else 0) +
-            (parent_cognitive.eval3_score if parent_cognitive else 0)
-        )
-        
-        # Print total scores for debugging
-        print(f"\nTotals:")
-        print(f"Teacher evaluation totals: {teacher_eval1_total}, {teacher_eval2_total}, {teacher_eval3_total}")
-        print(f"Parent evaluation totals: {parent_eval1_total}, {parent_eval2_total}, {parent_eval3_total}")
-        print("=============== END DEBUG INFO ===============\n\n")
-        
-        # If there's no data at all, try to create some sample data for testing the UI
-        if (teacher_eval1_total == 0 and teacher_eval2_total == 0 and teacher_eval3_total == 0 and
-            parent_eval1_total == 0 and parent_eval2_total == 0 and parent_eval3_total == 0):
-            
-            print("NO DATA FOUND! Creating sample data for testing...")
-            
-            # Create sample data
-            teacher_eval1_total = 25
-            teacher_eval2_total = 35 
-            teacher_eval3_total = 50
-            parent_eval1_total = 20
-            parent_eval2_total = 30
-            parent_eval3_total = 45
-            
-            # Create a filter based on the approach that worked
-            if matching_approach == "contains":
-                evaluations_filter = {'student_name__icontains': search_term}
-            else:
-                evaluations_filter = {'student_name__iexact': search_term}
-        
-        # Use the same matching approach for the collections
-        if matching_approach == "contains":
-            evaluations_filter = {'student_name__icontains': search_term}
-            gross_evaluations = GrossEvaluation.objects.filter(**evaluations_filter)
-            fine_evaluations = FineEvaluation.objects.filter(**evaluations_filter)
-            self_help_evaluations = SelfHelpEvaluation.objects.filter(**evaluations_filter)
-            receptive_evaluations = ReceptiveEvaluation.objects.filter(**evaluations_filter)
-            expressive_evaluations = ExpressiveEvaluation.objects.filter(**evaluations_filter) 
-            cognitive_evaluations = CognitiveEvaluation.objects.filter(**evaluations_filter)
-            social_evaluations = ParentSocialEvaluation.objects.filter(**evaluations_filter)
-        else:
-            evaluations_filter = {'student_name__iexact': search_term}
-            gross_evaluations = GrossEvaluation.objects.filter(**evaluations_filter)
-            fine_evaluations = FineEvaluation.objects.filter(**evaluations_filter)
-            self_help_evaluations = SelfHelpEvaluation.objects.filter(**evaluations_filter)
-            receptive_evaluations = ReceptiveEvaluation.objects.filter(**evaluations_filter)
-            expressive_evaluations = ExpressiveEvaluation.objects.filter(**evaluations_filter)
-            cognitive_evaluations = CognitiveEvaluation.objects.filter(**evaluations_filter)
-            social_evaluations = ParentSocialEvaluation.objects.filter(**evaluations_filter)
-            
-        return render(request, 'PDash.html', {
-            'student': student,  # Pass the student object which contains child_name
-            'student_name': student_name,
-            'teacher_data_json': json.dumps(teacher_data),
-            'parent_data_json': json.dumps(parent_data),
-            'teacher_evaluations': {
-                'gross': teacher_gross,
-                'fine': teacher_fine,
-                'self_help': teacher_self_help,
-                'receptive': teacher_receptive,
-                'expressive': teacher_expressive,
-                'cognitive': teacher_cognitive
-            },
-            'parent_evaluations': {
-                'gross': parent_gross,
-                'self_help': parent_self_help,
-                'social': parent_social,
-                'expressive': parent_expressive,
-                'cognitive': parent_cognitive
-            },
-            'teacher_eval1_total': teacher_eval1_total,
-            'teacher_eval2_total': teacher_eval2_total,
-            'teacher_eval3_total': teacher_eval3_total,
-            'parent_eval1_total': parent_eval1_total,
-            'parent_eval2_total': parent_eval2_total,
-            'parent_eval3_total': parent_eval3_total,
-            'has_data': True,
-            'gross_evaluations': gross_evaluations,
-            'fine_evaluations': fine_evaluations,
-            'self_help_evaluations': self_help_evaluations,
-            'receptive_evaluations': receptive_evaluations,
-            'expressive_evaluations': expressive_evaluations,
-            'cognitive_evaluations': cognitive_evaluations,
-            'social_evaluations': social_evaluations,
-            'debug_info': {
-                'username': username,
-                'student_found': bool(student),
-                'student_name': student_name if student else None,
-                'matching_approach': matching_approach,
-                'search_term': search_term,
-                'teacher_evals_found': any([teacher_gross, teacher_fine, teacher_self_help, teacher_receptive, teacher_expressive, teacher_cognitive]),
-                'parent_evals_found': any([parent_gross, parent_self_help, parent_social, parent_expressive, parent_cognitive])
-            }
-        })
-    except Exception as e:
-        # Handle any errors that might occur
-        import traceback
-        print(f"Error in overall view: {str(e)}")
-        print(traceback.format_exc())
-        return render(request, 'PDash.html', {
-            'has_data': False,
-            'error_message': f"An error occurred while retrieving evaluation data: {str(e)}"
-        })
-
 def student_performance(request):
     """
     View function that displays the overall performance of a student based on student name.
@@ -1312,11 +982,23 @@ def student_performance(request):
     student_name = request.GET.get('student_name', '')
     
     if not student_name:
-        # If no student name provided, render a search form
-        return render(request, 'student_search.html', {
-            'has_data': False,
-            'show_search': True
-        })
+        # Check if the logged-in user is a parent
+        username = request.user.username
+        
+        # Try to find student by father's name or mother's name
+        father_student = Student.objects.filter(father_name__iexact=username.replace('_', ' ')).first()
+        mother_student = Student.objects.filter(mother_name__iexact=username.replace('_', ' ')).first()
+        
+        if father_student or mother_student:
+            # This is a parent, get their child's name
+            student = father_student if father_student else mother_student
+            student_name = student.child_name
+        else:
+            # If no student name provided and not a parent, render a search form
+            return render(request, 'student_search.html', {
+                'has_data': False,
+                'show_search': True
+            })
     
     try:
         # Check if the student exists
@@ -1554,4 +1236,38 @@ def calculate_progress(initial_score, final_score):
     
     progress = ((final_score - initial_score) / initial_score) * 100
     return max(0, progress)  # Don't show negative progress
+
+@login_required
+def student_profile(request):
+    """
+    View function to display a student's profile information.
+    For parents, shows their child's profile.
+    """
+    # Get the logged-in user's username
+    username = request.user.username
+    
+    # Convert username to proper format for comparison (replace underscores with spaces)
+    username = username.replace('_', ' ')
+    
+    # Try to find student by father's or mother's name
+    student = Student.objects.filter(
+        Q(father_name__iexact=username) | 
+        Q(mother_name__iexact=username)
+    ).first()
+    
+    if not student:
+        messages.error(request, "No student profile found for this parent account.")
+        return redirect('dashboard')
+    
+    # Calculate age from date of birth
+    today = date.today()
+    age = today.year - student.dob.year - ((today.month, today.day) < (student.dob.month, student.dob.day))
+    
+    context = {
+        'student': student,
+        'age': age,
+        'active_section': 'profile'
+    }
+    
+    return render(request, 'student_profile.html', context)
 

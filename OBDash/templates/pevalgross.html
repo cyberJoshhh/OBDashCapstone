@@ -4,82 +4,261 @@
 {% load static %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/pdash.css' %}">
 
-<div class="evaluation-container">
-    <div class="back-button-container">
-        <a href="{% url 'dashboard' %}" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
+<div class="dashboard-container">
+    <!-- Add this button for mobile menu toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Add this for the sidebar overlay -->
+    <div id="sidebarOverlay"></div>
+
+    <!-- Create the sidebar structure -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>OB Pagsasarili</h3>
+        </div>
+        <div class="sidebar-content">
+            <a href="{% url 'dashboard' %}" class="sidebar-btn">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'student_profile' %}" class="sidebar-btn">
+                <i class="fas fa-user"></i>
+                <span>Student Profile</span>
+            </a>
+            <a href="{% url 'student_performance' %}" class="sidebar-btn">
+                <i class="fas fa-chart-line"></i>
+                <span>Performance Report</span>
+            </a>
+            <a href="#" class="sidebar-btn">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+                <span class="notification-badge"></span>
+            </a>
+            <a href="{% url 'evaluation_gross' %}" class="sidebar-btn active">
+                <i class="fas fa-chart-bar"></i>
+                <span>Evaluation</span>
+            </a>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
     </div>
 
-    <h1 class="domain-title">Gross Motor Domain</h1>
-    
-    <!-- Include the domain navigation -->
-    {% include 'domain_nav.html' with active_domain='gross' %}
-    
-    <div class="evaluation-table">
-        <table>
-            <thead>
-                <tr>
-                    <th class="gross-motor-col">Gross Motor</th>
-                    <th class="material-col">Material / Procedure</th>
-                    <th class="eval-col">1st Eval</th>
-                    <th class="eval-col">2nd Eval</th>
-                    <th class="eval-col">3rd Eval</th>
-                    <th class="comments-col">Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1. Climbs on the chair or other elevated furniture like a bed without a help</td>
-                    <td>Parental report will suffice.</td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="text" class="comment-input"></td>
-                </tr>
-                <tr>
-                    <td>2. Walks downstairs, 2 feet on each step, with one handheld</td>
-                    <td>
-                        MATERIAL: toy<br>
-                        PROCEDURE: Ask the child to walk backwards by demonstrating this. Credit if the child is able to walk backwards without falling and holding anything. Parental report will suffice.
-                    </td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="text" class="comment-input"></td>
-                </tr>
-                <tr>
-                    <td>3. Dances patterns/joins group movement activities</td>
-                    <td>
-                        MATERIAL: ball<br>
-                        PROCEDURE: Encourage the child to run by rolling a ball across the floor. Credit if the child can run past and without tripping or falling.
-                    </td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="text" class="comment-input"></td>
-                </tr>
-                <tr>
-                    <td>--</td>
-                    <td colspan="1" class="total-row">TOTAL SCORE</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="submit-button-container">
-        <button type="button" class="submit-button">
-            <i class="fas fa-save"></i> Save Evaluation
-        </button>
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="evaluation-container">
+            <div class="back-button-container">
+                <a href="{% url 'dashboard' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <h1 class="domain-title">Gross Motor Domain</h1>
+            
+            <!-- Include the domain navigation -->
+            {% include 'domain_nav.html' with active_domain='gross' %}
+            
+            <div class="evaluation-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="gross-motor-col">Gross Motor</th>
+                            <th class="material-col">Material / Procedure</th>
+                            <th class="eval-col">1st Eval</th>
+                            <th class="eval-col">2nd Eval</th>
+                            <th class="eval-col">3rd Eval</th>
+                            <th class="comments-col">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. Climbs on the chair or other elevated furniture like a bed without a help</td>
+                            <td>Parental report will suffice.</td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text" class="comment-input"></td>
+                        </tr>
+                        <tr>
+                            <td>2. Walks downstairs, 2 feet on each step, with one handheld</td>
+                            <td>
+                                MATERIAL: toy<br>
+                                PROCEDURE: Ask the child to walk backwards by demonstrating this. Credit if the child is able to walk backwards without falling and holding anything. Parental report will suffice.
+                            </td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text" class="comment-input"></td>
+                        </tr>
+                        <tr>
+                            <td>3. Dances patterns/joins group movement activities</td>
+                            <td>
+                                MATERIAL: ball<br>
+                                PROCEDURE: Encourage the child to run by rolling a ball across the floor. Credit if the child can run past and without tripping or falling.
+                            </td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox"></td>
+                            <td><input type="text" class="comment-input"></td>
+                        </tr>
+                        <tr>
+                            <td>--</td>
+                            <td colspan="1" class="total-row">TOTAL SCORE</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="submit-button-container">
+                <button type="button" class="submit-button">
+                    <i class="fas fa-save"></i> Save Evaluation
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+/* Main Content Styles */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background-color: #2d6a4f;
+    color: white;
+    z-index: 1001;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.sidebar-content {
+    padding: 20px 0;
+}
+
+.sidebar-btn, .logout-btn {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.sidebar-btn:hover, .logout-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.sidebar-btn i, .logout-btn i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.logout-btn {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Mobile Toggle Button */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background-color: #2d6a4f;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+/* Overlay for mobile */
+#sidebarOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: none;
+}
+
+/* Sidebar active state */
+.sidebar-btn.active {
+    background-color: rgba(255,255,255,0.2);
+    border-left: 4px solid #fff;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    #sidebarOverlay.active {
+        display: block;
+    }
+    
+    .welcome-header {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 70px; /* Leave space for mobile menu button */
+    }
+}
+
 .back-button-container {
     margin-bottom: 1rem;
 }
@@ -106,7 +285,7 @@
 }
 
 .evaluation-container {
-    padding: 2rem;
+    padding: 1rem;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -241,6 +420,32 @@ input[type="checkbox"] {
 </style>
 
 <script>
+// Mobile menu toggle functionality
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+// Function to toggle sidebar
+function toggleSidebar() {
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+}
+
+// Add click event to mobile menu toggle
+mobileMenuToggle.addEventListener('click', toggleSidebar);
+
+// Close sidebar when clicking on overlay
+sidebarOverlay.addEventListener('click', toggleSidebar);
+
+// Fix for sidebar links to ensure they're clickable
+const sidebarLinks = document.querySelectorAll('.sidebar-btn, .logout-btn');
+sidebarLinks.forEach(link => {
+    link.style.pointerEvents = 'auto';
+    link.style.cursor = 'pointer';
+    link.style.position = 'relative';
+    link.style.zIndex = '1002';
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     function countCheckedBoxes(columnIndex) {
         let count = 0;
@@ -254,133 +459,70 @@ document.addEventListener('DOMContentLoaded', function() {
         return count;
     }
 
-    function updateTotalScore() {
-        // Get the total row cells
-        const totalRow = document.querySelector('tbody tr:last-child');
+    function updateTotals() {
+        const eval1Total = countCheckedBoxes(3);
+        const eval2Total = countCheckedBoxes(4);
+        const eval3Total = countCheckedBoxes(5);
         
-        // Count and update for each evaluation column
-        const firstEvalTotal = countCheckedBoxes(3);  // 3rd column (1st Eval)
-        const secondEvalTotal = countCheckedBoxes(4); // 4th column (2nd Eval)
-        const thirdEvalTotal = countCheckedBoxes(5);  // 5th column (3rd Eval)
-
-        // Update the total cells
-        totalRow.cells[2].textContent = firstEvalTotal;
-        totalRow.cells[3].textContent = secondEvalTotal;
-        totalRow.cells[4].textContent = thirdEvalTotal;
-
-        // Add animation effect
-        [2, 3, 4].forEach(index => {
-            totalRow.cells[index].style.backgroundColor = '#e8f5e9';
-            setTimeout(() => {
-                totalRow.cells[index].style.backgroundColor = '';
-            }, 500);
-        });
+        document.querySelector('tbody tr:last-child td:nth-child(3)').textContent = eval1Total;
+        document.querySelector('tbody tr:last-child td:nth-child(4)').textContent = eval2Total;
+        document.querySelector('tbody tr:last-child td:nth-child(5)').textContent = eval3Total;
     }
 
-    // Add event listeners to checkboxes
+    // Add event listeners to all checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            // Highlight the cell when checked
-            const cell = this.parentElement;
-            cell.style.backgroundColor = this.checked ? '#e8f5e9' : '';
-            
-            // Update the totals
-            updateTotalScore();
-        });
+        checkbox.addEventListener('change', updateTotals);
     });
 
-    // Initialize totals on page load
-    updateTotalScore();
+    // Initial totals update
+    updateTotals();
     
-    // Updated submission function
-    document.querySelector('.submit-button').addEventListener('click', function() {
-        // Get the total scores
-        const totalRow = document.querySelector('tbody tr:last-child');
-        const eval1Score = parseInt(totalRow.cells[2].textContent) || 0;
-        const eval2Score = parseInt(totalRow.cells[3].textContent) || 0;
-        const eval3Score = parseInt(totalRow.cells[4].textContent) || 0;
-        
-        // Get student ID and name from hidden input fields
-        const studentId = document.getElementById('student-id') ? document.getElementById('student-id').value : '';
-        const studentName = document.getElementById('student-name') ? document.getElementById('student-name').value : '';
-        
-        // Create form data
-        const formData = new FormData();
-        formData.append('student_id', studentId);
-        formData.append('student_name', studentName);
-        formData.append('eval1_score', eval1Score);
-        formData.append('eval2_score', eval2Score);
-        formData.append('eval3_score', eval3Score);
+    // Save button logic
+    const saveButton = document.querySelector('.submit-button');
+    saveButton.addEventListener('click', function() {
+        // Gather the data
+        const eval1Score = parseInt(document.querySelector('tbody tr:last-child td:nth-child(3)').textContent);
+        const eval2Score = parseInt(document.querySelector('tbody tr:last-child td:nth-child(4)').textContent);
+        const eval3Score = parseInt(document.querySelector('tbody tr:last-child td:nth-child(5)').textContent);
         
         // Collect comments
         const comments = [];
-        document.querySelectorAll('.comment-input').forEach(function(input, index) {
-            if (input.value.trim() !== '') {
-                comments.push({
-                    item: index + 1,
-                    comment: input.value.trim()
-                });
+        document.querySelectorAll('.comment-input').forEach((input, index) => {
+            if (input.value) {
+                comments.push({ number: index + 1, text: input.value });
             }
         });
         
-        if (comments.length > 0) {
-            formData.append('comments', JSON.stringify(comments));
-        }
-        
-        // Get CSRF token
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
-        // Add visual feedback
-        const submitButton = document.querySelector('.submit-button');
-        const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        submitButton.disabled = true;
-        
-        // Submit the data to the new endpoint
-        fetch('{% url "parent_evaluation_gross" %}', {
+        // Send data via AJAX
+        fetch("{% url 'parent_evaluation_gross' %}", {
             method: 'POST',
-            body: formData,
             headers: {
-                'X-CSRFToken': csrfToken
-            }
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({
+                'student_name': '{{ student.child_name }}',
+                'eval1_score': eval1Score,
+                'eval2_score': eval2Score,
+                'eval3_score': eval3Score,
+                'comments': JSON.stringify(comments)
+            })
         })
-        .then(response => {
-            submitButton.disabled = false;
-            if (response.ok) {
-                return response.json().then(data => {
-                    submitButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                    setTimeout(() => {
-                        alert('Gross Motor evaluation saved successfully!');
-                        window.location.href = '{% url "dashboard" %}';
-                    }, 500);
-                });
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Evaluation saved successfully!');
+                window.location.href = "{% url 'dashboard' %}";
             } else {
-                submitButton.innerHTML = originalText;
-                return response.json().then(data => {
-                    throw new Error(data.message || 'Error saving evaluation');
-                });
+                alert('Error: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            submitButton.innerHTML = originalText;
-            submitButton.disabled = false;
-            alert(error.message || 'Error saving evaluation. Please try again.');
+            alert('An error occurred while saving the evaluation.');
         });
     });
 });
 </script>
-
-<!-- Add CSRF Token -->
-{% csrf_token %}
-
-<!-- Add hidden fields for student information -->
-{% if student %}
-<input type="hidden" id="student-id" value="{{ student.id }}">
-<input type="hidden" id="student-name" value="{{ student.child_name }}">
-{% else %}
-<input type="hidden" id="student-id" value="">
-<input type="hidden" id="student-name" value="Unknown Student">
-{% endif %}
 {% endblock %}
