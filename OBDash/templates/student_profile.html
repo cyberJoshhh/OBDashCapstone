@@ -28,7 +28,7 @@
             </a>
             <a href="{% url 'student_profile' %}" class="sidebar-btn active">
                 <i class="fas fa-user"></i>
-                <span>Student Profile</span>
+                <span>Pupil's Profile</span>
             </a>
             <a href="{% url 'student_performance' %}" class="sidebar-btn">
                 <i class="fas fa-chart-line"></i>
@@ -43,7 +43,7 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Evaluation</span>
             </a>
-            <a href="{% url 'logout' %}" class="logout-btn">
+            <a href="{% url 'logout' %}" class="logout-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>
@@ -54,7 +54,7 @@
     <div class="main-content">
         <div class="welcome-header">
             <div class="welcome-text">
-                Student Profile for <span>{{ student.child_name }}</span>
+                Pupil's profile for <span>{{ student.child_name }}</span>
             </div>
             <div class="header-buttons">
                 <a href="{% url 'dashboard' %}" class="settings-btn">
@@ -596,6 +596,17 @@
         if (printButton) {
             printButton.addEventListener('click', function() {
                 window.print();
+            });
+        }
+        
+        // Logout confirmation
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm("Are you sure you want to logout?")) {
+                    window.location.href = this.getAttribute('href');
+                }
             });
         }
     });

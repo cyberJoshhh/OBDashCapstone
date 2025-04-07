@@ -15,17 +15,38 @@
         </a>
         <a href="{% url 'add_student' %}" class="sidebar-btn {% if request.path == '/add_student/' %}active{% endif %}">
             <i class="fas fa-user-plus"></i>
-            <span>Add Student</span>
+            <span>Add Pupil</span>
         </a>
+
+        <a href="{% url 'messages_view' %}" class="sidebar-btn {% if request.path == '/messages/' %}active{% endif %}">
+            <i class="fas fa-envelope"></i>
+            <span>Messages</span>
+        </a>
+
         <a href="{% url 'settings' %}" class="sidebar-btn {% if request.path == '/settings/' %}active{% endif %}">
             <i class="fas fa-cog"></i>
             <span>Settings</span>
         </a>
     </div>
     <div class="sidebar-footer">
-        <a href="{% url 'logout' %}" class="logout-btn">
+        <a href="{% url 'logout' %}" class="logout-btn" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
         </a>
     </div>
-</div> 
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Logout confirmation
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm("Are you sure you want to logout?")) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        }
+    });
+</script> 

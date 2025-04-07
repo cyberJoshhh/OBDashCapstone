@@ -11,44 +11,6 @@
     <button class="mobile-menu-toggle" id="mobileMenuToggle">
         <i class="fas fa-bars"></i>
     </button>
-
-    <!-- Add this for the sidebar overlay -->
-    <div id="sidebarOverlay"></div>
-
-    <!-- Create the sidebar structure -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>OB Pagsasarili</h3>
-        </div>
-        <div class="sidebar-content">
-            <a href="{% url 'dashboard' %}" class="sidebar-btn">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="{% url 'student_profile' %}" class="sidebar-btn">
-                <i class="fas fa-user"></i>
-                <span>Student Profile</span>
-            </a>
-            <a href="{% url 'student_performance' %}" class="sidebar-btn">
-                <i class="fas fa-chart-line"></i>
-                <span>Performance Report</span>
-            </a>
-            <a href="#" class="sidebar-btn">
-                <i class="fas fa-envelope"></i>
-                <span>Messages</span>
-                <span class="notification-badge"></span>
-            </a>
-            <a href="{% url 'evaluation_gross' %}" class="sidebar-btn active">
-                <i class="fas fa-chart-bar"></i>
-                <span>Evaluation</span>
-            </a>
-            <a href="{% url 'logout' %}" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </div>
-
     <!-- Main content -->
     <div class="main-content">
         <div class="evaluation-container">
@@ -130,9 +92,11 @@
 <style>
 /* Main Content Styles */
 .main-content {
-    margin-left: 250px;
+    margin-left: 0;
     padding: 20px;
     transition: margin-left 0.3s ease;
+    display: flex;
+    justify-content: center;
 }
 
 @media (max-width: 768px) {
@@ -288,6 +252,7 @@
     padding: 1rem;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .domain-title {

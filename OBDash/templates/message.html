@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="mb-4">Messages</h2>
+                    <p class="lead">Under Development by the developer</p>
+                    <p class="lead">Ayaw mo pagbuot kay kapoy na kaayo  </p>
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

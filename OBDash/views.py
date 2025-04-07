@@ -1271,3 +1271,10 @@ def student_profile(request):
     
     return render(request, 'student_profile.html', context)
 
+@login_required
+def messages_view(request):
+    """
+    View function for the messages page.
+    """
+    return render(request, 'message.html')
+

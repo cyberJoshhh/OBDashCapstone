@@ -25,6 +25,7 @@ from .views import (
     ParentEvaluationExpressive,
     ParentEvaluationCognitive,
     student_profile,
+    messages_view,
 )
 
 urlpatterns = [
@@ -41,6 +42,7 @@ urlpatterns = [
     path('submit-selfhelp-evaluation/', submit_selfhelp_evaluation, name='submit_selfhelp_evaluation'),
     path('performance/', performance_view, name='performance'),
     path('settings/', settings_view, name='settings'),
+    path('messages/', messages_view, name='messages_view'),
     path('evaluation-gross/', evaluation_gross, name='evaluation_gross'),
     path('evaluation-self/', evaluation_self, name='evaluation_self'),
     path('evaluation-expressive/', evaluation_expressive, name='evaluation_expressive'),
